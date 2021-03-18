@@ -17,8 +17,6 @@ const messages = defineMessages({
   notifications: 'Notifications',
   notificationsettings: 'Notification Settings',
   email: 'Email',
-  plexuser: 'Plex User',
-  localuser: 'Local User',
   toastSettingsSuccess: 'Notification settings saved successfully!',
   toastSettingsFailure: 'Something went wrong while saving settings.',
 });
