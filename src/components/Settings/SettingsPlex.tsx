@@ -38,9 +38,8 @@ const messages = defineMessages({
   toastPlexConnecting: 'Attempting to connect to Plex…',
   toastPlexConnectingSuccess: 'Plex connection established successfully!',
   toastPlexConnectingFailure: 'Failed to connect to Plex.',
-  settingUpPlex: 'Setting Up Plex',
   settingUpPlexDescription:
-    'To set up Plex, you can either enter your details manually or select a server retrieved from <RegisterPlexTVLink>plex.tv</RegisterPlexTVLink>. Press the button to the right of the dropdown to check connectivity and retrieve available servers.',
+    'To set up Plex, you can either enter your details manually or select a server retrieved from <RegisterPlexTVLink>plex.tv</RegisterPlexTVLink>. Press the button to the right of the dropdown to fetch the list of available servers.',
   hostname: 'Hostname or IP Address',
   port: 'Port',
   enablessl: 'Enable SSL',
@@ -94,7 +93,6 @@ interface SettingsPlexProps {
 const SettingsPlex: React.FC<SettingsPlexProps> = ({ onComplete }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isRefreshingPresets, setIsRefreshingPresets] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const [availableServers, setAvailableServers] = useState<PlexDevice[] | null>(
     null
   );
@@ -270,8 +268,8 @@ const SettingsPlex: React.FC<SettingsPlexProps> = ({ onComplete }) => {
           {intl.formatMessage(messages.plexsettingsDescription)}
         </p>
         <div className="section">
-          <Alert title={intl.formatMessage(messages.settingUpPlex)} type="info">
-            {intl.formatMessage(messages.settingUpPlexDescription, {
+          <Alert
+            title={intl.formatMessage(messages.settingUpPlexDescription, {
               RegisterPlexTVLink: function RegisterPlexTVLink(msg) {
                 return (
                   <a
@@ -285,7 +283,8 @@ const SettingsPlex: React.FC<SettingsPlexProps> = ({ onComplete }) => {
                 );
               },
             })}
-          </Alert>
+            type="info"
+          />
         </div>
       </div>
       <Formik
@@ -316,7 +315,6 @@ const SettingsPlex: React.FC<SettingsPlexProps> = ({ onComplete }) => {
             } as PlexSettings);
 
             revalidate();
-            setSubmitError(null);
             if (toastId) {
               removeToast(toastId);
             }
@@ -335,7 +333,6 @@ const SettingsPlex: React.FC<SettingsPlexProps> = ({ onComplete }) => {
               autoDismiss: true,
               appearance: 'error',
             });
-            setSubmitError(e.response.data.message);
           }
         }}
       >
@@ -515,18 +512,6 @@ const SettingsPlex: React.FC<SettingsPlexProps> = ({ onComplete }) => {
                   />
                 </div>
               </div>
-              {submitError && (
-                <div className="mt-6 sm:gap-4 sm:items-start">
-                  <Alert
-                    title={intl.formatMessage(
-                      messages.toastPlexConnectingFailure
-                    )}
-                    type="error"
-                  >
-                    {submitError}
-                  </Alert>
-                </div>
-              )}
               <div className="actions">
                 <div className="flex justify-end">
                   <span className="inline-flex ml-3 rounded-md shadow-sm">

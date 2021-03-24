@@ -51,11 +51,9 @@ const UserPermissions: React.FC = () => {
           </h3>
         </div>
         <Alert
-          title={intl.formatMessage(globalMessages.unauthorized)}
+          title={intl.formatMessage(messages.unauthorizedDescription)}
           type="error"
-        >
-          {intl.formatMessage(messages.unauthorizedDescription)}
-        </Alert>
+        />
       </>
     );
   }

@@ -21,7 +21,6 @@ const messages = defineMessages({
   telegramsettingssaved: 'Telegram notification settings saved successfully!',
   telegramsettingsfailed: 'Telegram notification settings failed to save.',
   testsent: 'Test notification sent!',
-  settinguptelegram: 'Setting Up Telegram Notifications',
   settinguptelegramDescription:
     'To configure Telegram notifications, you will need to <CreateBotLink>create a bot</CreateBotLink> and get the bot API key. Additionally, you will need the chat ID for the chat to which you would like to send notifications. You can find this by adding <GetIdBotLink>@get_id_bot</GetIdBotLink> to the chat and issuing the <code>/my_id</code> command.',
   notificationtypes: 'Notification Types',
@@ -111,10 +110,7 @@ const NotificationsTelegram: React.FC = () => {
         return (
           <>
             <Alert
-              title={intl.formatMessage(messages.settinguptelegram)}
-              type="info"
-            >
-              {intl.formatMessage(messages.settinguptelegramDescription, {
+              title={intl.formatMessage(messages.settinguptelegramDescription, {
                 CreateBotLink: function CreateBotLink(msg) {
                   return (
                     <a
@@ -143,7 +139,8 @@ const NotificationsTelegram: React.FC = () => {
                   return <code className="bg-opacity-50">{msg}</code>;
                 },
               })}
-            </Alert>
+              type="info"
+            />
             <Form className="section">
               <div className="form-row">
                 <label htmlFor="enabled" className="checkbox-label">
