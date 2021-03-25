@@ -103,6 +103,7 @@ interface FullPublicSettings extends PublicSettings {
   emailEnabled: boolean;
   discordEnabled: boolean;
   telegramEnabled: boolean;
+  telegramBotUsername?: string;
 }
 
 export interface NotificationAgentConfig {
@@ -374,6 +375,8 @@ class Settings {
       emailEnabled: this.data.notifications.agents.email.enabled,
       discordEnabled: this.data.notifications.agents.discord.enabled,
       telegramEnabled: this.data.notifications.agents.telegram.enabled,
+      telegramBotUsername: this.data.notifications.agents.telegram.options
+        .botUsername,
     };
   }
 
