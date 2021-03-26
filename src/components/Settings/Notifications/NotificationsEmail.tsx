@@ -167,7 +167,7 @@ const NotificationsEmail: React.FC = () => {
                       {
                         strong: function strong(msg) {
                           return (
-                            <strong className="font-normal text-indigo-100">
+                            <strong className="font-semibold text-indigo-100">
                               {msg}
                             </strong>
                           );
@@ -181,7 +181,7 @@ const NotificationsEmail: React.FC = () => {
                       {
                         strong: function strong(msg) {
                           return (
-                            <strong className="font-normal text-indigo-100">
+                            <strong className="font-semibold text-indigo-100">
                               {msg}
                             </strong>
                           );

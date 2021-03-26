@@ -109,7 +109,7 @@ const NotificationsPushover: React.FC = () => {
                   return (
                     <a
                       href="https://pushover.net/apps/build"
-                      className="text-indigo-100 hover:text-white hover:underline"
+                      className="text-white transition duration-300 hover:underline"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -121,7 +121,7 @@ const NotificationsPushover: React.FC = () => {
                   return (
                     <a
                       href="https://github.com/sct/overseerr/tree/develop/public"
-                      className="text-indigo-100 hover:text-white hover:underline"
+                      className="text-white transition duration-300 hover:underline"
                       target="_blank"
                       rel="noreferrer"
                     >
