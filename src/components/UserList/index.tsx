@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import useSWR from 'swr';
-import LoadingSpinner from '../Common/LoadingSpinner';
-import Badge from '../Common/Badge';
-import { defineMessages, useIntl } from 'react-intl';
-import Button from '../Common/Button';
-import { hasPermission } from '../../../server/lib/permissions';
-import { Permission, User, UserType, useUser } from '../../hooks/useUser';
+import axios from 'axios';
+import { Field, Form, Formik } from 'formik';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { defineMessages, useIntl } from 'react-intl';
+import { useToasts } from 'react-toast-notifications';
+import useSWR from 'swr';
+import * as Yup from 'yup';
+import type { UserResultsResponse } from '../../../server/interfaces/api/userInterfaces';
+import { hasPermission } from '../../../server/lib/permissions';
+import AddUserIcon from '../../assets/useradd.svg';
+import { Permission, User, UserType, useUser } from '../../hooks/useUser';
+import globalMessages from '../../i18n/globalMessages';
+import Alert from '../Common/Alert';
+import Badge from '../Common/Badge';
+import Button from '../Common/Button';
 import Header from '../Common/Header';
+import LoadingSpinner from '../Common/LoadingSpinner';
+import Modal from '../Common/Modal';
+import PageTitle from '../Common/PageTitle';
 import Table from '../Common/Table';
 import Transition from '../Transition';
-import Modal from '../Common/Modal';
-import axios from 'axios';
-import { useToasts } from 'react-toast-notifications';
-import globalMessages from '../../i18n/globalMessages';
-import { Field, Form, Formik } from 'formik';
-import * as Yup from 'yup';
-import AddUserIcon from '../../assets/useradd.svg';
-import Alert from '../Common/Alert';
 import BulkEditModal from './BulkEditModal';
-import PageTitle from '../Common/PageTitle';
-import Link from 'next/link';
-import type { UserResultsResponse } from '../../../server/interfaces/api/userInterfaces';
 
 const messages = defineMessages({
   users: 'Users',
@@ -29,21 +29,20 @@ const messages = defineMessages({
   importfromplex: 'Import Users from Plex',
   importfromplexerror: 'Something went wrong while importing users from Plex.',
   importedfromplex:
-    '{userCount, plural, =0 {No new users} one {# new user} other {# new users}} imported from Plex.',
+    '{userCount, plural, one {# new user} other {# new users}} imported from Plex successfully!',
+  nouserstoimport: 'No new users to import from Plex.',
   user: 'User',
   totalrequests: 'Total Requests',
   accounttype: 'Account Type',
   role: 'Role',
   created: 'Created',
   lastupdated: 'Last Updated',
-  edit: 'Edit',
   bulkedit: 'Bulk Edit',
-  delete: 'Delete',
   owner: 'Owner',
   admin: 'Admin',
   plexuser: 'Plex User',
   deleteuser: 'Delete User',
-  userdeleted: 'User deleted',
+  userdeleted: 'User deleted successfully!',
   userdeleteerror: 'Something went wrong while deleting the user.',
   deleteconfirm:
     'Are you sure you want to delete this user? All existing request data from this user will be removed.',
@@ -67,11 +66,6 @@ const messages = defineMessages({
   sortUpdated: 'Last Updated',
   sortDisplayName: 'Display Name',
   sortRequests: 'Request Count',
-  next: 'Next',
-  previous: 'Previous',
-  showingresults:
-    'Showing <strong>{from}</strong> to <strong>{to}</strong> of <strong>{total}</strong> results',
-  resultsperpage: 'Display {pageSize} results per page',
 });
 
 type Sort = 'created' | 'updated' | 'requests' | 'displayname';
@@ -80,9 +74,11 @@ const UserList: React.FC = () => {
   const intl = useIntl();
   const router = useRouter();
   const { addToast } = useToasts();
-  const [pageIndex, setPageIndex] = useState(0);
   const [currentSort, setCurrentSort] = useState<Sort>('created');
   const [currentPageSize, setCurrentPageSize] = useState<number>(10);
+
+  const page = router.query.page ? Number(router.query.page) : 1;
+  const pageIndex = page - 1;
 
   const { data, error, revalidate } = useSWR<UserResultsResponse>(
     `/api/v1/user?take=${currentPageSize}&skip=${
@@ -106,6 +102,27 @@ const UserList: React.FC = () => {
   const [showBulkEditModal, setShowBulkEditModal] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const { user: currentUser } = useUser();
+
+  useEffect(() => {
+    const filterString = window.localStorage.getItem('ul-filter-settings');
+
+    if (filterString) {
+      const filterSettings = JSON.parse(filterString);
+
+      setCurrentSort(filterSettings.currentSort);
+      setCurrentPageSize(filterSettings.currentPageSize);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      'ul-filter-settings',
+      JSON.stringify({
+        currentSort,
+        currentPageSize,
+      })
+    );
+  }, [currentSort, currentPageSize]);
 
   const isUserPermsEditable = (userId: number) =>
     userId !== 1 && userId !== currentUser?.id;
@@ -169,9 +186,11 @@ const UserList: React.FC = () => {
         '/api/v1/user/import-from-plex'
       );
       addToast(
-        intl.formatMessage(messages.importedfromplex, {
-          userCount: createdUsers.length,
-        }),
+        createdUsers.length
+          ? intl.formatMessage(messages.importedfromplex, {
+              userCount: createdUsers.length,
+            })
+          : intl.formatMessage(messages.nouserstoimport),
         {
           autoDismiss: true,
           appearance: 'success',
@@ -433,8 +452,8 @@ const UserList: React.FC = () => {
               id="sort"
               name="sort"
               onChange={(e) => {
-                setPageIndex(0);
                 setCurrentSort(e.target.value as Sort);
+                router.push(router.pathname);
               }}
               value={currentSort}
               className="rounded-r-only"
@@ -576,7 +595,7 @@ const UserList: React.FC = () => {
                     )
                   }
                 >
-                  {intl.formatMessage(messages.edit)}
+                  {intl.formatMessage(globalMessages.edit)}
                 </Button>
                 <Button
                   buttonType="danger"
@@ -587,7 +606,7 @@ const UserList: React.FC = () => {
                   }
                   onClick={() => setDeleteModal({ isOpen: true, user })}
                 >
-                  {intl.formatMessage(messages.delete)}
+                  {intl.formatMessage(globalMessages.delete)}
                 </Button>
               </Table.TD>
             </tr>
@@ -601,7 +620,7 @@ const UserList: React.FC = () => {
                 <div className="hidden lg:flex lg:flex-1">
                   <p className="text-sm">
                     {data.results.length > 0 &&
-                      intl.formatMessage(messages.showingresults, {
+                      intl.formatMessage(globalMessages.showingresults, {
                         from: pageIndex * currentPageSize + 1,
                         to:
                           data.results.length < currentPageSize
@@ -616,14 +635,16 @@ const UserList: React.FC = () => {
                 </div>
                 <div className="flex justify-center sm:flex-1 sm:justify-start lg:justify-center">
                   <span className="items-center -mt-3 text-sm sm:-ml-4 lg:ml-0 sm:mt-0">
-                    {intl.formatMessage(messages.resultsperpage, {
+                    {intl.formatMessage(globalMessages.resultsperpage, {
                       pageSize: (
                         <select
                           id="pageSize"
                           name="pageSize"
                           onChange={(e) => {
-                            setPageIndex(0);
                             setCurrentPageSize(Number(e.target.value));
+                            router
+                              .push(router.pathname)
+                              .then(() => window.scrollTo(0, 0));
                           }}
                           value={currentPageSize}
                           className="inline short"
@@ -641,15 +662,35 @@ const UserList: React.FC = () => {
                 <div className="flex justify-center flex-auto space-x-2 sm:justify-end sm:flex-1">
                   <Button
                     disabled={!hasPrevPage}
-                    onClick={() => setPageIndex((current) => current - 1)}
+                    onClick={() =>
+                      router
+                        .push(
+                          `${router.pathname}?page=${page - 1}`,
+                          undefined,
+                          {
+                            shallow: true,
+                          }
+                        )
+                        .then(() => window.scrollTo(0, 0))
+                    }
                   >
-                    {intl.formatMessage(messages.previous)}
+                    {intl.formatMessage(globalMessages.previous)}
                   </Button>
                   <Button
                     disabled={!hasNextPage}
-                    onClick={() => setPageIndex((current) => current + 1)}
+                    onClick={() =>
+                      router
+                        .push(
+                          `${router.pathname}?page=${page + 1}`,
+                          undefined,
+                          {
+                            shallow: true,
+                          }
+                        )
+                        .then(() => window.scrollTo(0, 0))
+                    }
                   >
-                    {intl.formatMessage(messages.next)}
+                    {intl.formatMessage(globalMessages.next)}
                   </Button>
                 </div>
               </nav>
