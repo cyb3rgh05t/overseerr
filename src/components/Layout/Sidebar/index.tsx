@@ -242,7 +242,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
                   </a>
                 </span>
               </div>
-              <nav className="flex-1 px-2 mt-5 space-y-1 bg-gray-800">
+              <nav className="flex-1 px-2 mt-5 space-y-1 bg-black">
                 {SidebarLinks.filter((link) =>
                   link.requiredPermission
                     ? hasPermission(link.requiredPermission)
