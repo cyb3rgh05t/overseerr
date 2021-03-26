@@ -78,7 +78,7 @@ const Login: React.FC = () => {
       <div className="relative z-40 px-4 sm:mx-auto sm:w-full sm:max-w-md">
         <img src="/logo.png" className="w-auto mx-auto max-h-32" alt="Logo" />
         <h2 className="mt-2 text-3xl font-extrabold leading-9 text-center text-gray-100">
-          <FormattedMessage {...messages.signinheader} />
+          
         </h2>
       </div>
       <div className="relative z-50 mt-8 sm:mx-auto sm:w-full sm:max-w-md">
