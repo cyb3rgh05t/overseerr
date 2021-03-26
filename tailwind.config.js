@@ -1,62 +1,41 @@
 /* eslint-disable */
-const defaultTheme = require('tailwindcss/defaultTheme');
+const colors = require('tailwindcss/colors');
 
 module.exports = {
   purge: ['./src/pages/**/*.{ts,tsx}', './src/components/**/*.{ts,tsx}'],
   theme: {
-    extend: {
-      transitionProperty: {
-        'max-height': 'max-height',
-        width: 'width',
-      },
-      fontFamily: {
-        sans: ['Inter var', ...defaultTheme.fontFamily.sans],
-      },
-      typography: (theme) => ({
-        DEFAULT: {
-          css: {
-            color: theme('colors.gray.300'),
-            a: {
-              color: theme('colors.indigo.500'),
-              '&:hover': {
-                color: theme('colors.indigo.400'),
-              },
-            },
-
-            h1: {
-              color: theme('colors.gray.300'),
-            },
-            h2: {
-              color: theme('colors.gray.300'),
-            },
-            h3: {
-              color: theme('colors.gray.300'),
-            },
-            h4: {
-              color: theme('colors.gray.300'),
-            },
-            h5: {
-              color: theme('colors.gray.300'),
-            },
-            h6: {
-              color: theme('colors.gray.300'),
-            },
-
-            strong: {
-              color: theme('colors.gray.400'),
-            },
-
-            code: {
-              color: theme('colors.gray.300'),
-            },
-
-            figcaption: {
-              color: theme('colors.gray.500'),
-            },
-          },
-        },
-      }),
+    screens: {
+      sm: '480px',
+      md: '768px',
+      lg: '976px',
+      xl: '1440px',
     },
+    colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      black: 'transparent',
+      white: '#fff',
+      gray: 'transparent',
+	  purple: colors.violet,
+	  green: colors.emerald,
+	  pink: colors.pink,
+      indigo: colors.indigo,
+      red: colors.rose,
+      yellow: colors.amber,
+    },
+    fontFamily: {
+      sans: ['Graphik', 'sans-serif'],
+      serif: ['Merriweather', 'serif'],
+    },
+    extend: {
+      spacing: {
+        '128': '32rem',
+        '144': '36rem',
+      },
+      borderRadius: {
+        '4xl': '2rem',
+      }
+    }
   },
   variants: {
     cursor: ['disabled'],

@@ -10,7 +10,15 @@ html {
 }
 
 body {
-  @apply bg-gray-900;
+  background: radial-gradient(circle, #3a3a3a, #2d2d2d, #202020, #141414, #000000) center center/cover no-repeat fixed;
+  background-repeat: repeat, no-repeat;
+  background-attachment: fixed, fixed;
+  background-position: center center, center center;
+  background-size: auto, cover;
+  -webkit-background-size: auto, cover;
+  -moz-background-size: auto, cover;
+  -o-background-size: auto, cover;
+  color: #fff !important;
 }
 
 .searchbar {
