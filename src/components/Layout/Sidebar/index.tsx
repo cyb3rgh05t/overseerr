@@ -234,7 +234,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
 
       <div className="fixed top-0 bottom-0 left-0 hidden md:flex md:flex-shrink-0">
         <div className="flex flex-col w-64 sidebar">
-          <div className="flex flex-col flex-1 h-0 bg-gray-800">
+          <div className="flex flex-col flex-1 bg-black">
             <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
               <div className="flex items-center flex-shrink-0 px-4">
                 <span className="text-2xl text-gray-50">
@@ -243,7 +243,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
                   </a>
                 </span>
               </div>
-              <nav className="flex-1 px-2 mt-5 space-y-1 bg-gray-800">
+              <nav className="flex-1 px-2 mt-5 space-y-1 bg-black">
                 {SidebarLinks.filter((link) =>
                   link.requiredPermission
                     ? hasPermission(link.requiredPermission)
