@@ -10,6 +10,7 @@ import * as Yup from 'yup';
 import type { UserResultsResponse } from '../../../server/interfaces/api/userInterfaces';
 import { hasPermission } from '../../../server/lib/permissions';
 import AddUserIcon from '../../assets/useradd.svg';
+import { useUpdateQueryParams } from '../../hooks/useUpdateQueryParams';
 import { Permission, User, UserType, useUser } from '../../hooks/useUser';
 import globalMessages from '../../i18n/globalMessages';
 import Alert from '../Common/Alert';
@@ -79,6 +80,7 @@ const UserList: React.FC = () => {
 
   const page = router.query.page ? Number(router.query.page) : 1;
   const pageIndex = page - 1;
+  const updateQueryParams = useUpdateQueryParams({ page: page.toString() });
 
   const { data, error, revalidate } = useSWR<UserResultsResponse>(
     `/api/v1/user?take=${currentPageSize}&skip=${
@@ -101,7 +103,7 @@ const UserList: React.FC = () => {
   });
   const [showBulkEditModal, setShowBulkEditModal] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const { user: currentUser } = useUser();
+  const { user: currentUser, hasPermission: currentHasPermission } = useUser();
 
   useEffect(() => {
     const filterString = window.localStorage.getItem('ul-filter-settings');
@@ -538,7 +540,7 @@ const UserList: React.FC = () => {
                   </Link>
                   <div className="ml-4">
                     <Link href={`/users/${user.id}`}>
-                      <a className="text-sm font-medium leading-5">
+                      <a className="text-sm font-medium leading-5 transition duration-300 hover:underline">
                         {user.displayName}
                       </a>
                     </Link>
@@ -549,7 +551,19 @@ const UserList: React.FC = () => {
                 </div>
               </Table.TD>
               <Table.TD>
-                <div className="text-sm leading-5">{user.requestCount}</div>
+                {user.id === currentUser?.id ||
+                currentHasPermission(
+                  [Permission.MANAGE_REQUESTS, Permission.REQUEST_VIEW],
+                  { type: 'or' }
+                ) ? (
+                  <Link href={`/users/${user.id}/requests`}>
+                    <a className="text-sm leading-5 transition duration-300 hover:underline">
+                      {user.requestCount}
+                    </a>
+                  </Link>
+                ) : (
+                  user.requestCount
+                )}
               </Table.TD>
               <Table.TD>
                 {user.userType === UserType.PLEX ? (
@@ -663,15 +677,7 @@ const UserList: React.FC = () => {
                   <Button
                     disabled={!hasPrevPage}
                     onClick={() =>
-                      router
-                        .push(
-                          `${router.pathname}?page=${page - 1}`,
-                          undefined,
-                          {
-                            shallow: true,
-                          }
-                        )
-                        .then(() => window.scrollTo(0, 0))
+                      updateQueryParams('page', (page - 1).toString())
                     }
                   >
                     {intl.formatMessage(globalMessages.previous)}
@@ -679,15 +685,7 @@ const UserList: React.FC = () => {
                   <Button
                     disabled={!hasNextPage}
                     onClick={() =>
-                      router
-                        .push(
-                          `${router.pathname}?page=${page + 1}`,
-                          undefined,
-                          {
-                            shallow: true,
-                          }
-                        )
-                        .then(() => window.scrollTo(0, 0))
+                      updateQueryParams('page', (page + 1).toString())
                     }
                   >
                     {intl.formatMessage(globalMessages.next)}
