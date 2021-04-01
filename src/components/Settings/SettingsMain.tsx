@@ -12,6 +12,7 @@ import Badge from '../Common/Badge';
 import Button from '../Common/Button';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import PageTitle from '../Common/PageTitle';
+import LanguageSelector from '../LanguageSelector';
 import RegionSelector from '../RegionSelector';
 import CopyButton from './CopyButton';
 
@@ -46,7 +47,6 @@ const messages = defineMessages({
   validationApplicationTitle: 'You must provide an application title',
   validationApplicationUrl: 'You must provide a valid URL',
   validationApplicationUrlTrailingSlash: 'URL must not end in a trailing slash',
-  originalLanguageDefault: 'All Languages',
   partialRequestsEnabled: 'Allow Partial Series Requests',
 });
 
@@ -145,7 +145,6 @@ const SettingsMain: React.FC = () => {
             originalLanguage: data?.originalLanguage,
             partialRequestsEnabled: data?.partialRequestsEnabled,
             trustProxy: data?.trustProxy,
-            cacheImages: data?.cacheImages,
           }}
           enableReinitialize
           validationSchema={MainSettingsSchema}
@@ -160,7 +159,6 @@ const SettingsMain: React.FC = () => {
                 originalLanguage: values.originalLanguage,
                 partialRequestsEnabled: values.partialRequestsEnabled,
                 trustProxy: values.trustProxy,
-                cacheImages: values.cacheImages,
               });
               mutate('/api/v1/settings/public');
 
@@ -304,26 +302,6 @@ const SettingsMain: React.FC = () => {
                   </div>
                 </div>
                 <div className="form-row">
-                  <label htmlFor="csrfProtection" className="checkbox-label">
-                    <span className="mr-2">
-                      {intl.formatMessage(messages.cacheImages)}
-                    </span>
-                    <Badge badgeType="warning">
-                      {intl.formatMessage(globalMessages.experimental)}
-                    </Badge>
-                    <span className="label-tip">
-                      {intl.formatMessage(messages.cacheImagesTip)}
-                    </span>
-                  </label>
-                  <div className="form-input">
-                    <Field
-                      type="checkbox"
-                      id="cacheImages"
-                      name="cacheImages"
-                    />
-                  </div>
-                </div>
-                <div className="form-row">
                   <label htmlFor="region" className="text-label">
                     <span>{intl.formatMessage(messages.region)}</span>
                     <span className="label-tip">
@@ -347,26 +325,11 @@ const SettingsMain: React.FC = () => {
                   </label>
                   <div className="form-input">
                     <div className="form-input-field">
-                      <Field
-                        as="select"
-                        id="originalLanguage"
-                        name="originalLanguage"
-                      >
-                        <option value="">
-                          {intl.formatMessage(messages.originalLanguageDefault)}
-                        </option>
-                        {sortedLanguages?.map((language) => (
-                          <option
-                            key={`language-key-${language.iso_639_1}`}
-                            value={language.iso_639_1}
-                          >
-                            {intl.formatDisplayName(language.iso_639_1, {
-                              type: 'language',
-                              fallback: 'none',
-                            }) ?? language.english_name}
-                          </option>
-                        ))}
-                      </Field>
+                      <LanguageSelector
+                        languages={sortedLanguages ?? []}
+                        setFieldValue={setFieldValue}
+                        value={values.originalLanguage}
+                      />
                     </div>
                   </div>
                 </div>
