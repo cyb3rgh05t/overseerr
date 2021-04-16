@@ -213,9 +213,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
                               `}
                             >
                               {sidebarLink.svgIcon}
-                              <FormattedMessage
-                                {...messages[sidebarLink.messagesKey]}
-                              />
+                              {intl.formatMessage(
+                                messages[sidebarLink.messagesKey]
+                              )}
                             </a>
                           </Link>
                         );
