@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import SearchInput from './SearchInput';
-import UserDropdown from './UserDropdown';
-import Sidebar from './Sidebar';
-import LanguagePicker from './LanguagePicker';
 import { useRouter } from 'next/router';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import React, { useEffect, useState } from 'react';
+import { defineMessages, useIntl } from 'react-intl';
 import { Permission, useUser } from '../../hooks/useUser';
+import LanguagePicker from './LanguagePicker';
+import SearchInput from './SearchInput';
+import Sidebar from './Sidebar';
+import UserDropdown from './UserDropdown';
 
 const messages = defineMessages({
   betawarning:
@@ -18,7 +18,7 @@ const Layout: React.FC = ({ children }) => {
   const { hasPermission } = useUser();
   const router = useRouter();
   const intl = useIntl();
-  
+
   useEffect(() => {
     const updateScrolled = () => {
       if (window.pageYOffset > 60) {
