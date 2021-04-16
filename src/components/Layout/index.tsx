@@ -17,7 +17,8 @@ const Layout: React.FC = ({ children }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { hasPermission } = useUser();
   const router = useRouter();
-
+  const intl = useIntl();
+  
   useEffect(() => {
     const updateScrolled = () => {
       if (window.pageYOffset > 60) {
