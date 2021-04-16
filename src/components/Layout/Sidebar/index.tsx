@@ -1,10 +1,11 @@
-import React, { ReactNode, useRef } from 'react';
-import Transition from '../../Transition';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import { useUser, Permission } from '../../../hooks/useUser';
+import React, { ReactNode, useRef } from 'react';
+import { defineMessages, useIntl } from 'react-intl';
 import useClickOutside from '../../../hooks/useClickOutside';
+import { Permission, useUser } from '../../../hooks/useUser';
+import Transition from '../../Transition';
+import VersionStatus from '../VersionStatus';
 
 const messages = defineMessages({
   dashboard: 'Discover',
