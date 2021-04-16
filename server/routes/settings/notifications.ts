@@ -1,15 +1,35 @@
 import { Router } from 'express';
+import { getSettings } from '../../lib/settings';
 import { Notification } from '../../lib/notifications';
 import DiscordAgent from '../../lib/notifications/agents/discord';
 import EmailAgent from '../../lib/notifications/agents/email';
-import PushbulletAgent from '../../lib/notifications/agents/pushbullet';
-import PushoverAgent from '../../lib/notifications/agents/pushover';
 import SlackAgent from '../../lib/notifications/agents/slack';
 import TelegramAgent from '../../lib/notifications/agents/telegram';
+import PushoverAgent from '../../lib/notifications/agents/pushover';
 import WebhookAgent from '../../lib/notifications/agents/webhook';
-import { getSettings } from '../../lib/settings';
+import PushbulletAgent from '../../lib/notifications/agents/pushbullet';
 
 const notificationRoutes = Router();
+
+notificationRoutes.get('/', (_req, res) => {
+  const settings = getSettings().notifications;
+  return res.status(200).json({
+    enabled: settings.enabled,
+  });
+});
+
+notificationRoutes.post('/', (req, res) => {
+  const settings = getSettings();
+
+  Object.assign(settings.notifications, {
+    enabled: req.body.enabled,
+  });
+  settings.save();
+
+  return res.status(200).json({
+    enabled: settings.notifications.enabled,
+  });
+});
 
 notificationRoutes.get('/discord', (_req, res) => {
   const settings = getSettings();

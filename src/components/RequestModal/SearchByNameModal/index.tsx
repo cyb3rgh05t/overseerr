@@ -1,13 +1,14 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import useSWR from 'swr';
-import { SonarrSeries } from '../../../../server/api/servarr/sonarr';
+import { SonarrSeries } from '../../../../server/api/sonarr';
 import globalMessages from '../../../i18n/globalMessages';
 import Alert from '../../Common/Alert';
 import { SmallLoadingSpinner } from '../../Common/LoadingSpinner';
 import Modal from '../../Common/Modal';
 
 const messages = defineMessages({
+  notvdbid: 'Manual Match Required',
   notvdbiddescription:
     "We couldn't automatically match your request. Please select the correct match from the list below.",
   nosummary: 'No summary for this title was found.',
@@ -68,10 +69,9 @@ const SearchByNameModal: React.FC<SearchByNameModalProps> = ({
         </svg>
       }
     >
-      <Alert
-        title={intl.formatMessage(messages.notvdbiddescription)}
-        type="info"
-      />
+      <Alert title={intl.formatMessage(messages.notvdbid)} type="info">
+        {intl.formatMessage(messages.notvdbiddescription)}
+      </Alert>
       {!data && !error && <SmallLoadingSpinner />}
       <div className="grid grid-cols-1 gap-4 pb-2 md:grid-cols-2">
         {data?.slice(0, 6).map((item) => (

@@ -1,10 +1,10 @@
-# Webhook
+# Webhooks
 
-The webhook notification agent allows you to send a custom JSON payload to any endpoint.
+Webhooks allow you to send a custom JSON payload to any endpoint. You can also set an authorization header for security purposes.
 
 ## Configuration
 
-### Webhook URL
+### Webhook URL (required)
 
 The URL you would like to post notifications to. Your JSON will be sent as the body of the request.
 
@@ -16,7 +16,7 @@ This is typically not needed. Please refer to your webhook provider's documentat
 
 This value will be sent as an `Authorization` HTTP header.
 
-### JSON Payload
+### JSON Payload (required)
 
 Customize the JSON payload to suit your needs. Overseerr provides several [template variables](./webhooks.md#template-variables) for use in the payload, which will be replaced with the relevant data when the notifications are triggered.
 
@@ -31,41 +31,17 @@ Customize the JSON payload to suit your needs. Overseerr provides several [templ
 
 ### User
 
-These variables are for the target recipient of the notification.
+These variables are usually the target user of the notification.
 
 - `{{notifyuser_username}}` Target user's username.
-- `{{notifyuser_email}}` Target user's email address.
-- `{{notifyuser_avatar}}` Target user's avatar URL.
-- `{{notifyuser_settings_discordId}}` Target user's Discord ID (if one is set).
-- `{{notifyuser_settings_telegramChatId}}` Target user's Telegram Chat ID (if one is set).
+- `{{notifyuser_email}}` Target user's email.
+- `{{notifyuser_avatar}}` Target user's avatar.
+- `{{notifyuser_settings_discordId}}` Target user's discord ID (if one is set).
+- `{{notifyuser_settings_telegramChatId}}` Target user's telegram Chat ID (if one is set).
 
-{% hint style="info" %}
-The `notifyuser` variables are not set for the following notification types, as they are intended for application administrators rather than end users:
+### Media
 
-- Media Requested
-- Media Automatically Approved
-- Media Failed
-
-On the other hand, the `notifyuser` variables _will_ be replaced with the requesting user's information for the below notification types:
-
-- Media Approved
-- Media Declined
-- Media Available
-
-If you would like to use the requesting user's information in your webhook, please instead include the relevant variables from the [Request](#request) section below.
-{% endhint %}
-
-### Special
-
-The following variables must be used as a key in the JSON payload (e.g., `"{{extra}}": []`).
-
-- `{{request}}` This object will be `null` if there is no relevant request object for the notification.
-- `{{media}}` This object will be `null` if there is no relevant media object for the notification.
-- `{{extra}}` This object will contain the "extra" array of additional data for certain notifications.
-
-#### Media
-
-These `{{media}}` special variables are only included in media-related notifications, such as requests.
+These variables are only included in media related notifications, such as requests.
 
 - `{{media_type}}` Media type. Either `movie` or `tv`.
 - `{{media_tmdbid}}` Media's TMDb ID.
@@ -74,13 +50,10 @@ These `{{media}}` special variables are only included in media-related notificat
 - `{{media_status}}` Media's availability status (e.g., `AVAILABLE` or `PENDING`).
 - `{{media_status4k}}` Media's 4K availability status (e.g., `AVAILABLE` or `PENDING`).
 
-#### Request
+### Special
 
-The `{{request}}` special variables are only included in request-related notifications.
+The following variables must be used as a key in the JSON payload (e.g., `"{{extra}}": []`).
 
-- `{{request_id}}` Request ID.
-- `{{requestedBy_username}}` Requesting user's username.
-- `{{requestedBy_email}}` Requesting user's email address.
-- `{{requestedBy_avatar}}` Requesting user's avatar URL.
-- `{{requestedBy_settings_discordId}}` Requesting user's Discord ID (if one is set).
-- `{{requestedBy_settings_telegramChatId}}` Requesting user's Telegram Chat ID (if one is set).
+- `{{request}}` This object will be `null` if there is no relevant request object for the notification.
+- `{{media}}` This object will be `null` if there is no relevant media object for the notification.
+- `{{extra}}` This object will contain the "extra" array of additional data for certain notifications.

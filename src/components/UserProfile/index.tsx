@@ -21,7 +21,7 @@ import ProfileHeader from './ProfileHeader';
 
 const messages = defineMessages({
   recentrequests: 'Recent Requests',
-  norequests: 'No requests.',
+  norequests: 'No Requests',
   limit: '{remaining} of {limit}',
   requestsperdays: '{limit} remaining',
   unlimited: 'Unlimited',

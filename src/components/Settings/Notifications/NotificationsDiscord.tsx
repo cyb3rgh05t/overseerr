@@ -18,7 +18,8 @@ const messages = defineMessages({
   webhookUrlPlaceholder: 'Server Settings → Integrations → Webhooks',
   discordsettingssaved: 'Discord notification settings saved successfully!',
   discordsettingsfailed: 'Discord notification settings failed to save.',
-  testsent: 'Discord test notification sent!',
+  testsent: 'Test notification sent!',
+  notificationtypes: 'Notification Types',
   validationUrl: 'You must provide a valid URL',
 });
 
@@ -34,13 +35,7 @@ const NotificationsDiscord: React.FC = () => {
       .nullable()
       .url(intl.formatMessage(messages.validationUrl)),
     webhookUrl: Yup.string()
-      .when('enabled', {
-        is: true,
-        then: Yup.string()
-          .nullable()
-          .required(intl.formatMessage(messages.validationUrl)),
-        otherwise: Yup.string().nullable(),
-      })
+      .required(intl.formatMessage(messages.validationUrl))
       .url(intl.formatMessage(messages.validationUrl)),
   });
 
@@ -69,7 +64,6 @@ const NotificationsDiscord: React.FC = () => {
               webhookUrl: values.webhookUrl,
             },
           });
-
           addToast(intl.formatMessage(messages.discordsettingssaved), {
             appearance: 'success',
             autoDismiss: true,
@@ -169,10 +163,26 @@ const NotificationsDiscord: React.FC = () => {
                 )}
               </div>
             </div>
-            <NotificationTypeSelector
-              currentTypes={values.types}
-              onUpdate={(newTypes) => setFieldValue('types', newTypes)}
-            />
+            <div
+              role="group"
+              aria-labelledby="group-label"
+              className="form-group"
+            >
+              <div className="form-row">
+                <span id="group-label" className="group-label">
+                  {intl.formatMessage(messages.notificationtypes)}
+                  <span className="label-required">*</span>
+                </span>
+                <div className="form-input">
+                  <div className="max-w-lg">
+                    <NotificationTypeSelector
+                      currentTypes={values.types}
+                      onUpdate={(newTypes) => setFieldValue('types', newTypes)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="actions">
               <div className="flex justify-end">
                 <span className="inline-flex ml-3 rounded-md shadow-sm">

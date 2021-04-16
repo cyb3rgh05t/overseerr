@@ -92,12 +92,17 @@ components:
     UserSettings:
       type: object
       properties:
+        enableNotifications:
+          type: boolean
+          default: true
         discordId:
           type: string
-        region:
+        telegramChatId:
           type: string
-        language:
-          type: string
+        telegramSendSilently:
+          type: boolean
+      required:
+        - enableNotifications
     MainSettings:
       type: object
       properties:
@@ -195,6 +200,9 @@ components:
         message:
           type: string
           example: 'OK'
+        host:
+          type: string
+          example: '127-0-0-1.2ab6ce1a093d465e910def96cf4e4799.plex.direct'
       required:
         - protocol
         - address
@@ -433,15 +441,6 @@ components:
         - is4k
         - enableSeasonFolders
         - isDefault
-    ServarrTag:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-        label:
-          type: string
-          example: A Label
     PublicSettings:
       type: object
       properties:
@@ -1196,6 +1195,12 @@ components:
               type: string
             priority:
               type: number
+    NotificationSettings:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          example: true
     NotificationEmailSettings:
       type: object
       properties:
@@ -1548,22 +1553,10 @@ components:
     UserSettingsNotifications:
       type: object
       properties:
-        notificationAgents:
-          type: number
-          example: 0
-        emailEnabled:
+        enableNotifications:
           type: boolean
-        pgpKey:
-          type: string
-          nullable: true
-        discordEnabled:
-          type: boolean
+          default: true
         discordId:
-          type: string
-          nullable: true
-        telegramEnabled:
-          type: boolean
-        telegramBotUsername:
           type: string
           nullable: true
         telegramChatId:
@@ -1572,6 +1565,8 @@ components:
         telegramSendSilently:
           type: boolean
           nullable: true
+      required:
+        - enableNotifications
   securitySchemes:
     cookieAuth:
       type: apiKey
@@ -2305,6 +2300,37 @@ paths:
                     timestamp:
                       type: string
                       example: 2020-12-15T16:20:00.069Z
+  /settings/notifications:
+    get:
+      summary: Return notification settings
+      description: Returns current notification settings in a JSON object.
+      tags:
+        - settings
+      responses:
+        '200':
+          description: Returned settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettings'
+    post:
+      summary: Update notification settings
+      description: Updates notification settings with the provided values.
+      tags:
+        - settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSettings'
+      responses:
+        '200':
+          description: 'Values were sucessfully updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettings'
   /settings/notifications/email:
     get:
       summary: Get email notification settings

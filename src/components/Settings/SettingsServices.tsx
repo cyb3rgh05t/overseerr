@@ -20,9 +20,11 @@ import SonarrModal from './SonarrModal';
 const messages = defineMessages({
   services: 'Services',
   radarrsettings: 'Radarr Settings',
+  radarrSettingsDescription:
+    'Configure your Radarr connection below. You can have multiple Radarr configurations, but only two can be active as defaults at any time (one for standard HD and one for 4K). Administrators can override the server which is used for new requests.',
   sonarrsettings: 'Sonarr Settings',
-  serviceSettingsDescription:
-    'Configure your {serverType} server(s) below. You can connect multiple {serverType} servers, but only two of them can be marked as defaults (one non-4K and one 4K). Administrators are able to override the server used to process new requests prior to approval.',
+  sonarrSettingsDescription:
+    'Configure your Sonarr connection below. You can have multiple Sonarr configurations, but only two can be active as defaults at any time (one for standard HD and one for 4K). Administrators can override the server which is used for new requests.',
   deleteserverconfirm: 'Are you sure you want to delete this server?',
   ssl: 'SSL',
   default: 'Default',
@@ -31,12 +33,9 @@ const messages = defineMessages({
   activeProfile: 'Active Profile',
   addradarr: 'Add Radarr Server',
   addsonarr: 'Add Sonarr Server',
-  noDefaultServer:
-    'At least one {serverType} server must be marked as default in order for {mediaType} requests to be processed.',
-  noDefaultNon4kServer:
-    'If you only have a single {serverType} server for both non-4K and 4K content (or if you only download 4K content), your {serverType} server should <strong>NOT</strong> be designated as a 4K server.',
-  mediaTypeMovie: 'movie',
-  mediaTypeSeries: 'series',
+  nodefault: 'No Default Server',
+  nodefaultdescription:
+    'At least one server must be marked as default before any requests will make it to your services.',
 });
 
 interface ServerInstanceProps {
@@ -230,9 +229,7 @@ const SettingsServices: React.FC = () => {
           {intl.formatMessage(messages.radarrsettings)}
         </h3>
         <p className="description">
-          {intl.formatMessage(messages.serviceSettingsDescription, {
-            serverType: 'Radarr',
-          })}
+          {intl.formatMessage(messages.radarrSettingsDescription)}
         </p>
       </div>
       {editRadarrModal.open && (
@@ -287,31 +284,13 @@ const SettingsServices: React.FC = () => {
         {radarrData && !radarrError && (
           <>
             {radarrData.length > 0 &&
-              (!radarrData.some((radarr) => radarr.isDefault) ? (
-                <Alert
-                  title={intl.formatMessage(messages.noDefaultServer, {
-                    serverType: 'Radarr',
-                    mediaType: intl.formatMessage(messages.mediaTypeMovie),
-                  })}
-                />
-              ) : (
-                !radarrData.some(
-                  (radarr) => radarr.isDefault && !radarr.is4k
-                ) && (
-                  <Alert
-                    title={intl.formatMessage(messages.noDefaultNon4kServer, {
-                      serverType: 'Radarr',
-                      strong: function strong(msg) {
-                        return (
-                          <strong className="font-semibold text-yellow-100">
-                            {msg}
-                          </strong>
-                        );
-                      },
-                    })}
-                  />
-                )
-              ))}
+              !radarrData.some(
+                (radarr) => radarr.isDefault && !radarr.is4k
+              ) && (
+                <Alert title={intl.formatMessage(messages.nodefault)}>
+                  <p>{intl.formatMessage(messages.nodefaultdescription)}</p>
+                </Alert>
+              )}
             <ul className="grid max-w-6xl grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
               {radarrData.map((radarr) => (
                 <ServerInstance
@@ -368,9 +347,7 @@ const SettingsServices: React.FC = () => {
           {intl.formatMessage(messages.sonarrsettings)}
         </h3>
         <p className="description">
-          {intl.formatMessage(messages.serviceSettingsDescription, {
-            serverType: 'Sonarr',
-          })}
+          {intl.formatMessage(messages.sonarrSettingsDescription)}
         </p>
       </div>
       <div className="section">
@@ -378,31 +355,13 @@ const SettingsServices: React.FC = () => {
         {sonarrData && !sonarrError && (
           <>
             {sonarrData.length > 0 &&
-              (!sonarrData.some((sonarr) => sonarr.isDefault) ? (
-                <Alert
-                  title={intl.formatMessage(messages.noDefaultServer, {
-                    serverType: 'Sonarr',
-                    mediaType: intl.formatMessage(messages.mediaTypeSeries),
-                  })}
-                />
-              ) : (
-                !sonarrData.some(
-                  (sonarr) => sonarr.isDefault && !sonarr.is4k
-                ) && (
-                  <Alert
-                    title={intl.formatMessage(messages.noDefaultNon4kServer, {
-                      serverType: 'Sonarr',
-                      strong: function strong(msg) {
-                        return (
-                          <strong className="font-semibold text-yellow-100">
-                            {msg}
-                          </strong>
-                        );
-                      },
-                    })}
-                  />
-                )
-              ))}
+              !sonarrData.some(
+                (sonarr) => sonarr.isDefault && !sonarr.is4k
+              ) && (
+                <Alert title={intl.formatMessage(messages.nodefault)}>
+                  <p>{intl.formatMessage(messages.nodefaultdescription)}</p>
+                </Alert>
+              )}
             <ul className="grid max-w-6xl grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
               {sonarrData.map((sonarr) => (
                 <ServerInstance

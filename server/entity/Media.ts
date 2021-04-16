@@ -1,23 +1,23 @@
 import {
-  AfterLoad,
-  Column,
-  CreateDateColumn,
   Entity,
-  getRepository,
-  In,
+  PrimaryGeneratedColumn,
+  Column,
   Index,
   OneToMany,
-  PrimaryGeneratedColumn,
+  CreateDateColumn,
   UpdateDateColumn,
+  getRepository,
+  In,
+  AfterLoad,
 } from 'typeorm';
-import RadarrAPI from '../api/servarr/radarr';
-import SonarrAPI from '../api/servarr/sonarr';
-import { MediaStatus, MediaType } from '../constants/media';
-import downloadTracker, { DownloadingItem } from '../lib/downloadtracker';
-import { getSettings } from '../lib/settings';
-import logger from '../logger';
 import { MediaRequest } from './MediaRequest';
+import { MediaStatus, MediaType } from '../constants/media';
+import logger from '../logger';
 import Season from './Season';
+import { getSettings } from '../lib/settings';
+import RadarrAPI from '../api/radarr';
+import downloadTracker, { DownloadingItem } from '../lib/downloadtracker';
+import SonarrAPI from '../api/sonarr';
 
 @Entity()
 class Media {
@@ -168,7 +168,10 @@ class Media {
         if (server) {
           this.serviceUrl = server.externalUrl
             ? `${server.externalUrl}/movie/${this.externalServiceSlug}`
-            : RadarrAPI.buildUrl(server, `/movie/${this.externalServiceSlug}`);
+            : RadarrAPI.buildRadarrUrl(
+                server,
+                `/movie/${this.externalServiceSlug}`
+              );
         }
       }
 
@@ -181,7 +184,7 @@ class Media {
         if (server) {
           this.serviceUrl4k = server.externalUrl
             ? `${server.externalUrl}/movie/${this.externalServiceSlug4k}`
-            : RadarrAPI.buildUrl(
+            : RadarrAPI.buildRadarrUrl(
                 server,
                 `/movie/${this.externalServiceSlug4k}`
               );
@@ -199,7 +202,10 @@ class Media {
         if (server) {
           this.serviceUrl = server.externalUrl
             ? `${server.externalUrl}/series/${this.externalServiceSlug}`
-            : SonarrAPI.buildUrl(server, `/series/${this.externalServiceSlug}`);
+            : SonarrAPI.buildSonarrUrl(
+                server,
+                `/series/${this.externalServiceSlug}`
+              );
         }
       }
 
@@ -212,7 +218,7 @@ class Media {
         if (server) {
           this.serviceUrl4k = server.externalUrl
             ? `${server.externalUrl}/series/${this.externalServiceSlug4k}`
-            : SonarrAPI.buildUrl(
+            : SonarrAPI.buildSonarrUrl(
                 server,
                 `/series/${this.externalServiceSlug4k}`
               );

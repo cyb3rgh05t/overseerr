@@ -21,7 +21,7 @@ const messages = defineMessages({
   populartv: 'Popular Series',
   upcomingtv: 'Upcoming Series',
   recentlyAdded: 'Recently Added',
-  noRequests: 'No requests.',
+  nopending: 'No Pending Requests',
   upcoming: 'Upcoming Movies',
   trending: 'Trending',
 });
@@ -94,7 +94,7 @@ const Discover: React.FC = () => {
           />
         ))}
         placeholder={<RequestCard.Placeholder />}
-        emptyMessage={intl.formatMessage(messages.noRequests)}
+        emptyMessage={intl.formatMessage(messages.nopending)}
       />
       <MediaSlider
         sliderKey="trending"

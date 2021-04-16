@@ -107,7 +107,6 @@ const TvRequestModal: React.FC<RequestModalProps> = ({
           rootFolder: requestOverrides?.folder,
           languageProfileId: requestOverrides?.language,
           userId: requestOverrides?.user?.id,
-          tags: requestOverrides?.tags,
           seasons: selectedSeasons,
         });
       } else {
@@ -171,7 +170,6 @@ const TvRequestModal: React.FC<RequestModalProps> = ({
           rootFolder: requestOverrides.folder,
           languageProfileId: requestOverrides.language,
           userId: requestOverrides?.user?.id,
-          tags: requestOverrides.tags,
         };
       }
       const response = await axios.post<MediaRequest>('/api/v1/request', {
@@ -671,7 +669,6 @@ const TvRequestModal: React.FC<RequestModalProps> = ({
                     profile: editRequest.profileId,
                     server: editRequest.serverId,
                     language: editRequest.languageProfileId,
-                    tags: editRequest.tags,
                   }
                 : undefined
             }

@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { hasNotificationType, Notification } from '..';
-import { MediaType } from '../../../constants/media';
 import logger from '../../../logger';
 import { getSettings, NotificationAgentPushover } from '../../settings';
 import { BaseAgent, NotificationAgent, NotificationPayload } from './agent';
+import { MediaType } from '../../../constants/media';
 
 interface PushoverPayload {
   token: string;
@@ -160,11 +160,7 @@ class PushoverAgent
     type: Notification,
     payload: NotificationPayload
   ): Promise<boolean> {
-    logger.debug('Sending Pushover notification', {
-      label: 'Notifications',
-      type: Notification[type],
-      subject: payload.subject,
-    });
+    logger.debug('Sending Pushover notification', { label: 'Notifications' });
     try {
       const endpoint = 'https://api.pushover.net/1/messages.json';
 
@@ -193,12 +189,8 @@ class PushoverAgent
     } catch (e) {
       logger.error('Error sending Pushover notification', {
         label: 'Notifications',
-        type: Notification[type],
-        subject: payload.subject,
-        errorMessage: e.message,
-        response: e.response.data,
+        message: e.message,
       });
-
       return false;
     }
   }

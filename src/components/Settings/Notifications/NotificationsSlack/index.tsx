@@ -16,9 +16,11 @@ const messages = defineMessages({
   webhookUrl: 'Webhook URL',
   slacksettingssaved: 'Slack notification settings saved successfully!',
   slacksettingsfailed: 'Slack notification settings failed to save.',
-  testsent: 'Slack test notification sent!',
+  testsent: 'Test notification sent!',
+  settingupslack: 'Setting Up Slack Notifications',
   settingupslackDescription:
     'To configure Slack notifications, you will need to create an <WebhookLink>Incoming Webhook</WebhookLink> integration and enter the webhook URL below.',
+  notificationtypes: 'Notification Types',
   validationWebhookUrl: 'You must provide a valid URL',
 });
 
@@ -31,13 +33,7 @@ const NotificationsSlack: React.FC = () => {
 
   const NotificationsSlackSchema = Yup.object().shape({
     webhookUrl: Yup.string()
-      .when('enabled', {
-        is: true,
-        then: Yup.string()
-          .nullable()
-          .required(intl.formatMessage(messages.validationWebhookUrl)),
-        otherwise: Yup.string().nullable(),
-      })
+      .required(intl.formatMessage(messages.validationWebhookUrl))
       .url(intl.formatMessage(messages.validationWebhookUrl)),
   });
 
@@ -47,13 +43,13 @@ const NotificationsSlack: React.FC = () => {
 
   return (
     <>
-      <Alert
-        title={intl.formatMessage(messages.settingupslackDescription, {
+      <Alert title={intl.formatMessage(messages.settingupslack)} type="info">
+        {intl.formatMessage(messages.settingupslackDescription, {
           WebhookLink: function WebhookLink(msg) {
             return (
               <a
                 href="https://my.slack.com/services/new/incoming-webhook/"
-                className="text-white transition duration-300 hover:underline"
+                className="text-indigo-100 hover:text-white hover:underline"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -62,8 +58,7 @@ const NotificationsSlack: React.FC = () => {
             );
           },
         })}
-        type="info"
-      />
+      </Alert>
       <Formik
         initialValues={{
           enabled: data.enabled,
@@ -141,10 +136,28 @@ const NotificationsSlack: React.FC = () => {
                   )}
                 </div>
               </div>
-              <NotificationTypeSelector
-                currentTypes={values.types}
-                onUpdate={(newTypes) => setFieldValue('types', newTypes)}
-              />
+              <div
+                role="group"
+                aria-labelledby="group-label"
+                className="form-group"
+              >
+                <div className="form-row">
+                  <span id="group-label" className="group-label">
+                    {intl.formatMessage(messages.notificationtypes)}
+                    <span className="label-required">*</span>
+                  </span>
+                  <div className="form-input">
+                    <div className="max-w-lg">
+                      <NotificationTypeSelector
+                        currentTypes={values.types}
+                        onUpdate={(newTypes) =>
+                          setFieldValue('types', newTypes)
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className="actions">
                 <div className="flex justify-end">
                   <span className="inline-flex ml-3 rounded-md shadow-sm">

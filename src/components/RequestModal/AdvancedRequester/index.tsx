@@ -1,10 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Listbox, Transition } from '@headlessui/react';
-import { isEqual } from 'lodash';
-import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
-import type { OptionsType, OptionTypeBase } from 'react-select';
 import useSWR from 'swr';
 import type {
   ServiceCommonServer,
@@ -16,13 +13,6 @@ import globalMessages from '../../../i18n/globalMessages';
 import { formatBytes } from '../../../utils/numberHelpers';
 import { SmallLoadingSpinner } from '../../Common/LoadingSpinner';
 
-type OptionType = {
-  value: string;
-  label: string;
-};
-
-const Select = dynamic(() => import('react-select'), { ssr: false });
-
 const messages = defineMessages({
   advancedoptions: 'Advanced Options',
   destinationserver: 'Destination Server',
@@ -33,16 +23,12 @@ const messages = defineMessages({
   folder: '{path} ({space})',
   requestas: 'Request As',
   languageprofile: 'Language Profile',
-  tags: 'Tags',
-  selecttags: 'Select tags',
-  notagoptions: 'No tags.',
 });
 
 export type RequestOverrides = {
   server?: number;
   profile?: number;
   folder?: string;
-  tags?: number[];
   language?: number;
   user?: User;
 };
@@ -89,10 +75,6 @@ const AdvancedRequester: React.FC<AdvancedRequesterProps> = ({
 
   const [selectedLanguage, setSelectedLanguage] = useState<number>(
     defaultOverrides?.language ?? -1
-  );
-
-  const [selectedTags, setSelectedTags] = useState<number[]>(
-    defaultOverrides?.tags ?? []
   );
 
   const {
@@ -168,9 +150,6 @@ const AdvancedRequester: React.FC<AdvancedRequesterProps> = ({
             ? serverData.server.activeAnimeLanguageProfileId
             : serverData.server.activeLanguageProfileId)
       );
-      const defaultTags = isAnime
-        ? serverData.server.activeAnimeTags
-        : serverData.server.activeTags;
 
       if (
         defaultProfile &&
@@ -195,43 +174,46 @@ const AdvancedRequester: React.FC<AdvancedRequesterProps> = ({
       ) {
         setSelectedLanguage(defaultLanguage.id);
       }
-
-      if (
-        defaultTags &&
-        !isEqual(defaultTags, selectedTags) &&
-        (!defaultOverrides || defaultOverrides.tags === null)
-      ) {
-        setSelectedTags(defaultTags);
-      }
     }
   }, [serverData]);
 
   useEffect(() => {
-    if (defaultOverrides && defaultOverrides.server != null) {
+    if (
+      defaultOverrides &&
+      defaultOverrides.server !== null &&
+      defaultOverrides.server !== undefined
+    ) {
       setSelectedServer(defaultOverrides.server);
     }
 
-    if (defaultOverrides && defaultOverrides.profile != null) {
+    if (
+      defaultOverrides &&
+      defaultOverrides.profile !== null &&
+      defaultOverrides.profile !== undefined
+    ) {
       setSelectedProfile(defaultOverrides.profile);
     }
 
-    if (defaultOverrides && defaultOverrides.folder != null) {
+    if (
+      defaultOverrides &&
+      defaultOverrides.folder !== null &&
+      defaultOverrides.folder !== undefined
+    ) {
       setSelectedFolder(defaultOverrides.folder);
     }
 
-    if (defaultOverrides && defaultOverrides.language != null) {
+    if (
+      defaultOverrides &&
+      defaultOverrides.language !== null &&
+      defaultOverrides.language !== undefined
+    ) {
       setSelectedLanguage(defaultOverrides.language);
-    }
-
-    if (defaultOverrides && defaultOverrides.tags != null) {
-      setSelectedTags(defaultOverrides.tags);
     }
   }, [
     defaultOverrides?.server,
     defaultOverrides?.folder,
     defaultOverrides?.profile,
     defaultOverrides?.language,
-    defaultOverrides?.tags,
   ]);
 
   useEffect(() => {
@@ -242,7 +224,6 @@ const AdvancedRequester: React.FC<AdvancedRequesterProps> = ({
         server: selectedServer ?? undefined,
         user: selectedUser ?? undefined,
         language: selectedLanguage ?? undefined,
-        tags: selectedTags,
       });
     }
   }, [
@@ -251,7 +232,6 @@ const AdvancedRequester: React.FC<AdvancedRequesterProps> = ({
     selectedProfile,
     selectedUser,
     selectedLanguage,
-    selectedTags,
   ]);
 
   if (!data && !error) {
@@ -456,48 +436,9 @@ const AdvancedRequester: React.FC<AdvancedRequesterProps> = ({
             </div>
           </>
         )}
-        {!!data && selectedServer !== null && (
-          <div className="mt-0 sm:mt-2">
-            <label htmlFor="tags">{intl.formatMessage(messages.tags)}</label>
-            <Select
-              name="tags"
-              options={(serverData?.tags ?? []).map((tag) => ({
-                label: tag.label,
-                value: tag.id,
-              }))}
-              isMulti
-              isDisabled={isValidating || !serverData}
-              placeholder={
-                isValidating || !serverData
-                  ? intl.formatMessage(globalMessages.loading)
-                  : intl.formatMessage(messages.selecttags)
-              }
-              className="react-select-container react-select-container-dark"
-              classNamePrefix="react-select"
-              value={selectedTags.map((tagId) => {
-                const foundTag = serverData?.tags.find(
-                  (tag) => tag.id === tagId
-                );
-                return {
-                  value: foundTag?.id,
-                  label: foundTag?.label,
-                };
-              })}
-              onChange={(
-                value: OptionTypeBase | OptionsType<OptionType> | null
-              ) => {
-                if (!Array.isArray(value)) {
-                  return;
-                }
-                setSelectedTags(value?.map((option) => option.value));
-              }}
-              noOptionsMessage={() => intl.formatMessage(messages.notagoptions)}
-            />
-          </div>
-        )}
         {hasPermission([Permission.MANAGE_REQUESTS, Permission.MANAGE_USERS]) &&
           selectedUser && (
-            <div className="mt-2 first:mt-0">
+            <div className="first:mt-0 sm:mt-4">
               <Listbox
                 as="div"
                 value={selectedUser}

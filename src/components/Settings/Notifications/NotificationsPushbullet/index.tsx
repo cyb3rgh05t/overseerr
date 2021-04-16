@@ -18,9 +18,11 @@ const messages = defineMessages({
   pushbulletSettingsSaved:
     'Pushbullet notification settings saved successfully!',
   pushbulletSettingsFailed: 'Pushbullet notification settings failed to save.',
-  testSent: 'Pushbullet test notification sent!',
+  testSent: 'Test notification sent!',
+  settingUpPushbullet: 'Setting Up Pushbullet Notifications',
   settingUpPushbulletDescription:
-    'To configure Pushbullet notifications, you will need to <CreateAccessTokenLink>create an access token</CreateAccessTokenLink>.',
+    'To configure Pushbullet notifications, you will need to <CreateAccessTokenLink>create an access token</CreateAccessTokenLink> and enter it below.',
+  notificationTypes: 'Notification Types',
 });
 
 const NotificationsPushbullet: React.FC = () => {
@@ -31,13 +33,9 @@ const NotificationsPushbullet: React.FC = () => {
   );
 
   const NotificationsPushbulletSchema = Yup.object().shape({
-    accessToken: Yup.string().when('enabled', {
-      is: true,
-      then: Yup.string()
-        .nullable()
-        .required(intl.formatMessage(messages.validationAccessTokenRequired)),
-      otherwise: Yup.string().nullable(),
-    }),
+    accessToken: Yup.string().required(
+      intl.formatMessage(messages.validationAccessTokenRequired)
+    ),
   });
 
   if (!data && !error) {
@@ -94,25 +92,24 @@ const NotificationsPushbullet: React.FC = () => {
         return (
           <>
             <Alert
-              title={intl.formatMessage(
-                messages.settingUpPushbulletDescription,
-                {
-                  CreateAccessTokenLink: function CreateAccessTokenLink(msg) {
-                    return (
-                      <a
-                        href="https://www.pushbullet.com/#settings"
-                        className="text-white transition duration-300 hover:underline"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {msg}
-                      </a>
-                    );
-                  },
-                }
-              )}
+              title={intl.formatMessage(messages.settingUpPushbullet)}
               type="info"
-            />
+            >
+              {intl.formatMessage(messages.settingUpPushbulletDescription, {
+                CreateAccessTokenLink: function CreateAccessTokenLink(msg) {
+                  return (
+                    <a
+                      href="https://www.pushbullet.com/#settings"
+                      className="text-indigo-100 hover:text-white hover:underline"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {msg}
+                    </a>
+                  );
+                },
+              })}
+            </Alert>
             <Form className="section">
               <div className="form-row">
                 <label htmlFor="enabled" className="checkbox-label">
@@ -141,10 +138,28 @@ const NotificationsPushbullet: React.FC = () => {
                   )}
                 </div>
               </div>
-              <NotificationTypeSelector
-                currentTypes={values.types}
-                onUpdate={(newTypes) => setFieldValue('types', newTypes)}
-              />
+              <div
+                role="group"
+                aria-labelledby="group-label"
+                className="form-group"
+              >
+                <div className="form-row">
+                  <span id="group-label" className="group-label">
+                    {intl.formatMessage(messages.notificationTypes)}
+                    <span className="label-required">*</span>
+                  </span>
+                  <div className="form-input">
+                    <div className="max-w-lg">
+                      <NotificationTypeSelector
+                        currentTypes={values.types}
+                        onUpdate={(newTypes) =>
+                          setFieldValue('types', newTypes)
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className="actions">
                 <div className="flex justify-end">
                   <span className="inline-flex ml-3 rounded-md shadow-sm">

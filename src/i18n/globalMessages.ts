@@ -43,6 +43,7 @@ const globalMessages = defineMessages({
   loading: 'Loading…',
   settings: 'Settings',
   usersettings: 'User Settings',
+  unauthorized: 'Unauthorized',
   delimitedlist: '{a}, {b}',
   showingresults:
     'Showing <strong>{from}</strong> to <strong>{to}</strong> of <strong>{total}</strong> results',

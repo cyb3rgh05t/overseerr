@@ -1,11 +1,7 @@
 import axios from 'axios';
-import { getRepository } from 'typeorm';
 import { hasNotificationType, Notification } from '..';
-import { User } from '../../../entity/User';
 import logger from '../../../logger';
-import { Permission } from '../../permissions';
 import { getSettings, NotificationAgentDiscord } from '../../settings';
-import { NotificationAgentType } from '../agenttypes';
 import { BaseAgent, NotificationAgent, NotificationPayload } from './agent';
 
 enum EmbedColors {
@@ -111,7 +107,7 @@ class DiscordAgent
     if (payload.request) {
       fields.push({
         name: 'Requested By',
-        value: payload.request.requestedBy.displayName,
+        value: payload.request?.requestedBy.displayName ?? '',
         inline: true,
       });
     }
@@ -205,14 +201,7 @@ class DiscordAgent
     type: Notification,
     payload: NotificationPayload
   ): Promise<boolean> {
-    logger.debug('Sending Discord notification', {
-      label: 'Notifications',
-      type: Notification[type],
-      subject: payload.subject,
-    });
-
-    let content = undefined;
-
+    logger.debug('Sending Discord notification', { label: 'Notifications' });
     try {
       const {
         botUsername,
@@ -224,32 +213,16 @@ class DiscordAgent
         return false;
       }
 
-      if (payload.notifyUser) {
-        // Mention user who submitted the request
-        if (
-          payload.notifyUser.settings?.hasNotificationAgentEnabled(
-            NotificationAgentType.DISCORD
-          ) &&
-          payload.notifyUser.settings?.discordId
-        ) {
-          content = `<@${payload.notifyUser.settings.discordId}>`;
-        }
-      } else {
-        // Mention all users with the Manage Requests permission
-        const userRepository = getRepository(User);
-        const users = await userRepository.find();
+      const mentionedUsers: string[] = [];
+      let content = undefined;
 
-        content = users
-          .filter(
-            (user) =>
-              user.hasPermission(Permission.MANAGE_REQUESTS) &&
-              user.settings?.hasNotificationAgentEnabled(
-                NotificationAgentType.DISCORD
-              ) &&
-              user.settings?.discordId
-          )
-          .map((user) => `<@${user.settings?.discordId}>`)
-          .join(' ');
+      if (
+        payload.notifyUser &&
+        (payload.notifyUser.settings?.enableNotifications ?? true) &&
+        payload.notifyUser.settings?.discordId
+      ) {
+        mentionedUsers.push(payload.notifyUser.settings.discordId);
+        content = `<@${payload.notifyUser.settings.discordId}>`;
       }
 
       await axios.post(webhookUrl, {
@@ -257,19 +230,18 @@ class DiscordAgent
         avatar_url: botAvatarUrl,
         embeds: [this.buildEmbed(type, payload)],
         content,
+        allowed_mentions: {
+          users: mentionedUsers,
+        },
       } as DiscordWebhookPayload);
 
       return true;
     } catch (e) {
       logger.error('Error sending Discord notification', {
         label: 'Notifications',
-        mentions: content,
-        type: Notification[type],
-        subject: payload.subject,
-        errorMessage: e.message,
+        message: e.message,
         response: e.response.data,
       });
-
       return false;
     }
   }

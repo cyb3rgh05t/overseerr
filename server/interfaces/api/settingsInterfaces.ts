@@ -43,10 +43,3 @@ export interface CacheItem {
     vsize: number;
   };
 }
-
-export interface StatusResponse {
-  version: string;
-  commitTag: string;
-  updateAvailable: boolean;
-  commitsBehind: number;
-}

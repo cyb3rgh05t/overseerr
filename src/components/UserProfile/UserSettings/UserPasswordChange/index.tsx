@@ -6,6 +6,7 @@ import { defineMessages, useIntl } from 'react-intl';
 import { useToasts } from 'react-toast-notifications';
 import useSWR from 'swr';
 import * as Yup from 'yup';
+import useSettings from '../../../../hooks/useSettings';
 import { Permission, useUser } from '../../../../hooks/useUser';
 import globalMessages from '../../../../i18n/globalMessages';
 import Error from '../../../../pages/_error';
@@ -29,15 +30,17 @@ const messages = defineMessages({
     'Password is too short; should be a minimum of 8 characters',
   validationConfirmPassword: 'You must confirm the new password',
   validationConfirmPasswordSame: 'Passwords must match',
-  noPasswordSet:
-    'This user account currently does not have a password set. Configure a password below to enable this account to sign in as a "local user."',
-  noPasswordSetOwnAccount:
-    'Your account currently does not have a password set. Configure a password below to enable sign-in as a "local user" using your email address.',
+  nopasswordset: 'No Password Set',
+  nopasswordsetDescription:
+    'This user account currently does not have a password specifically for {applicationTitle}. Configure a password below to enable this account to sign in as a "local user."',
+  nopasswordsetDescriptionOwnAccount:
+    'Your account currently does not have a password specifically for {applicationTitle}. Configure a password below to enable sign in as a "local user" using your email address.',
   nopermissionDescription:
     "You do not have permission to modify this user's password.",
 });
 
 const UserPasswordChange: React.FC = () => {
+  const settings = useSettings();
   const intl = useIntl();
   const { addToast } = useToasts();
   const router = useRouter();
@@ -85,9 +88,11 @@ const UserPasswordChange: React.FC = () => {
           <h3 className="heading">{intl.formatMessage(messages.password)}</h3>
         </div>
         <Alert
-          title={intl.formatMessage(messages.nopermissionDescription)}
+          title={intl.formatMessage(globalMessages.unauthorized)}
           type="error"
-        />
+        >
+          {intl.formatMessage(messages.nopermissionDescription)}
+        </Alert>
       </>
     );
   }
@@ -148,12 +153,18 @@ const UserPasswordChange: React.FC = () => {
               {!data.hasPassword && (
                 <Alert
                   type="warning"
-                  title={intl.formatMessage(
+                  title={intl.formatMessage(messages.nopasswordset)}
+                >
+                  {intl.formatMessage(
                     user?.id === currentUser?.id
-                      ? messages.noPasswordSetOwnAccount
-                      : messages.noPasswordSet
+                      ? messages.nopasswordsetDescriptionOwnAccount
+                      : messages.nopasswordsetDescription,
+                    {
+                      applicationTitle:
+                        settings.currentSettings.applicationTitle,
+                    }
                   )}
-                />
+                </Alert>
               )}
               {data.hasPassword && user?.id === currentUser?.id && (
                 <div className="pb-6 form-row">
@@ -165,8 +176,7 @@ const UserPasswordChange: React.FC = () => {
                       <Field
                         id="currentPassword"
                         name="currentPassword"
-                        type="password"
-                        autoComplete="current-password"
+                        type="text"
                       />
                     </div>
                     {errors.currentPassword && touched.currentPassword && (
@@ -181,12 +191,7 @@ const UserPasswordChange: React.FC = () => {
                 </label>
                 <div className="form-input">
                   <div className="form-input-field">
-                    <Field
-                      id="newPassword"
-                      name="newPassword"
-                      type="password"
-                      autoComplete="new-password"
-                    />
+                    <Field id="newPassword" name="newPassword" type="text" />
                   </div>
                   {errors.newPassword && touched.newPassword && (
                     <div className="error">{errors.newPassword}</div>
@@ -202,8 +207,7 @@ const UserPasswordChange: React.FC = () => {
                     <Field
                       id="confirmPassword"
                       name="confirmPassword"
-                      type="password"
-                      autoComplete="new-password"
+                      type="text"
                     />
                   </div>
                   {errors.confirmPassword && touched.confirmPassword && (

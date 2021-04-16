@@ -5,10 +5,6 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import {
-  hasNotificationAgentEnabled,
-  NotificationAgentType,
-} from '../lib/notifications/agenttypes';
 import { User } from './User';
 
 @Entity()
@@ -24,17 +20,8 @@ export class UserSettings {
   @JoinColumn()
   public user: User;
 
-  @Column({ nullable: true })
-  public region?: string;
-
-  @Column({ nullable: true })
-  public originalLanguage?: string;
-
-  @Column({ type: 'integer', default: NotificationAgentType.EMAIL })
-  public notificationAgents = NotificationAgentType.EMAIL;
-
-  @Column({ nullable: true })
-  public pgpKey?: string;
+  @Column({ default: true })
+  public enableNotifications: boolean;
 
   @Column({ nullable: true })
   public discordId?: string;
@@ -45,7 +32,12 @@ export class UserSettings {
   @Column({ nullable: true })
   public telegramSendSilently?: boolean;
 
-  public hasNotificationAgentEnabled(agent: NotificationAgentType): boolean {
-    return !!hasNotificationAgentEnabled(agent, this.notificationAgents);
-  }
+  @Column({ nullable: true })
+  public region?: string;
+
+  @Column({ nullable: true })
+  public originalLanguage?: string;
+
+  @Column({ nullable: true })
+  public pgpKey?: string;
 }

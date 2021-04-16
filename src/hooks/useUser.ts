@@ -26,6 +26,7 @@ export interface User {
 }
 
 export interface UserSettings {
+  enableNotifications: boolean;
   discordId?: string;
   region?: string;
   originalLanguage?: string;

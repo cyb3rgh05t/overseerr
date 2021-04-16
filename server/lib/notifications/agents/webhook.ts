@@ -30,12 +30,6 @@ const KeyMap: Record<string, string | KeyMapFunction> = {
   media_status4k: (payload) =>
     payload.media?.status ? MediaStatus[payload.media?.status4k] : '',
   request_id: 'request.id',
-  requestedBy_username: 'request.requestedBy.displayName',
-  requestedBy_email: 'request.requestedBy.email',
-  requestedBy_avatar: 'request.requestedBy.avatar',
-  requestedBy_settings_discordId: 'request.requestedBy.settings.discordId',
-  requestedBy_settings_telegramChatId:
-    'request.requestedBy.settings.telegramChatId',
 };
 
 class WebhookAgent
@@ -128,12 +122,7 @@ class WebhookAgent
     type: Notification,
     payload: NotificationPayload
   ): Promise<boolean> {
-    logger.debug('Sending webhook notification', {
-      label: 'Notifications',
-      type: Notification[type],
-      subject: payload.subject,
-    });
-
+    logger.debug('Sending webhook notification', { label: 'Notifications' });
     try {
       const { webhookUrl, authHeader } = this.getSettings().options;
 
@@ -151,12 +140,8 @@ class WebhookAgent
     } catch (e) {
       logger.error('Error sending webhook notification', {
         label: 'Notifications',
-        type: Notification[type],
-        subject: payload.subject,
         errorMessage: e.message,
-        response: e.response.data,
       });
-
       return false;
     }
   }

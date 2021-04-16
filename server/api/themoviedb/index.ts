@@ -715,34 +715,7 @@ class TheMovieDb extends ExternalAPI {
         86400 // 24 hours
       );
 
-      if (
-        !language.startsWith('en') &&
-        data.genres.some((genre) => !genre.name)
-      ) {
-        const englishData = await this.get<TmdbGenresResult>(
-          '/genre/movie/list',
-          {
-            params: {
-              language: 'en',
-            },
-          },
-          86400 // 24 hours
-        );
-
-        data.genres
-          .filter((genre) => !genre.name)
-          .forEach((genre) => {
-            genre.name =
-              englishData.genres.find(
-                (englishGenre) => englishGenre.id === genre.id
-              )?.name ?? '';
-          });
-      }
-
-      const movieGenres = sortBy(
-        data.genres.filter((genre) => genre.name),
-        'name'
-      );
+      const movieGenres = sortBy(data.genres, 'name');
 
       return movieGenres;
     } catch (e) {
@@ -766,34 +739,7 @@ class TheMovieDb extends ExternalAPI {
         86400 // 24 hours
       );
 
-      if (
-        !language.startsWith('en') &&
-        data.genres.some((genre) => !genre.name)
-      ) {
-        const englishData = await this.get<TmdbGenresResult>(
-          '/genre/tv/list',
-          {
-            params: {
-              language: 'en',
-            },
-          },
-          86400 // 24 hours
-        );
-
-        data.genres
-          .filter((genre) => !genre.name)
-          .forEach((genre) => {
-            genre.name =
-              englishData.genres.find(
-                (englishGenre) => englishGenre.id === genre.id
-              )?.name ?? '';
-          });
-      }
-
-      const tvGenres = sortBy(
-        data.genres.filter((genre) => genre.name),
-        'name'
-      );
+      const tvGenres = sortBy(data.genres, 'name');
 
       return tvGenres;
     } catch (e) {
