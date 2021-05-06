@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
@@ -13,7 +13,6 @@ import Alert from '../../../Common/Alert';
 import Button from '../../../Common/Button';
 import LoadingSpinner from '../../../Common/LoadingSpinner';
 import PageTitle from '../../../Common/PageTitle';
-import SensitiveInput from '../../../Common/SensitiveInput';
 
 const messages = defineMessages({
   password: 'Password',
@@ -163,8 +162,7 @@ const UserPasswordChange: React.FC = () => {
                   </label>
                   <div className="form-input">
                     <div className="form-input-field">
-                      <SensitiveInput
-                        as="field"
+                      <Field
                         id="currentPassword"
                         name="currentPassword"
                         type="password"
@@ -183,8 +181,7 @@ const UserPasswordChange: React.FC = () => {
                 </label>
                 <div className="form-input">
                   <div className="form-input-field">
-                    <SensitiveInput
-                      as="field"
+                    <Field
                       id="newPassword"
                       name="newPassword"
                       type="password"
@@ -202,8 +199,7 @@ const UserPasswordChange: React.FC = () => {
                 </label>
                 <div className="form-input">
                   <div className="form-input-field">
-                    <SensitiveInput
-                      as="field"
+                    <Field
                       id="confirmPassword"
                       name="confirmPassword"
                       type="password"

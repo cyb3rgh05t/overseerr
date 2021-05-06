@@ -1,14 +1,15 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useContext } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import useSWR from 'swr';
 import { MovieDetails } from '../../../../server/models/Movie';
+import { LanguageContext } from '../../../context/LanguageContext';
 import Error from '../../../pages/_error';
 import Header from '../../Common/Header';
 import LoadingSpinner from '../../Common/LoadingSpinner';
-import PageTitle from '../../Common/PageTitle';
 import PersonCard from '../../PersonCard';
+import PageTitle from '../../Common/PageTitle';
 
 const messages = defineMessages({
   fullcrew: 'Full Crew',
@@ -17,8 +18,9 @@ const messages = defineMessages({
 const MovieCrew: React.FC = () => {
   const router = useRouter();
   const intl = useIntl();
+  const { locale } = useContext(LanguageContext);
   const { data, error } = useSWR<MovieDetails>(
-    `/api/v1/movie/${router.query.movieId}`
+    `/api/v1/movie/${router.query.movieId}?language=${locale}`
   );
 
   if (!data && !error) {

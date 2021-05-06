@@ -81,14 +81,16 @@ function Button<P extends ElementTypes = 'button'>(
 
   switch (buttonSize) {
     case 'sm':
-      buttonStyle.push('px-2.5 py-1.5 text-xs button-sm');
-      break;
-    case 'lg':
-      buttonStyle.push('px-6 py-3 text-base button-lg');
+      buttonStyle.push('px-2.5 py-1.5 text-xs');
       break;
     case 'md':
+      buttonStyle.push('px-4 py-2 text-sm');
+      break;
+    case 'lg':
+      buttonStyle.push('px-6 py-3 text-base');
+      break;
     default:
-      buttonStyle.push('px-4 py-2 text-sm button-md');
+      buttonStyle.push('px-4 py-2 text-sm');
   }
 
   buttonStyle.push(className ?? '');

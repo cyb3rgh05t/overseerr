@@ -1,15 +1,16 @@
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React from 'react';
-import { defineMessages, useIntl } from 'react-intl';
+import React, { useContext } from 'react';
 import useSWR from 'swr';
 import type { TvResult } from '../../../server/models/Search';
+import ListView from '../Common/ListView';
+import { useRouter } from 'next/router';
+import { LanguageContext } from '../../context/LanguageContext';
+import { useIntl, defineMessages } from 'react-intl';
 import type { TvDetails } from '../../../server/models/Tv';
+import Header from '../Common/Header';
+import PageTitle from '../Common/PageTitle';
 import useDiscover from '../../hooks/useDiscover';
 import Error from '../../pages/_error';
-import Header from '../Common/Header';
-import ListView from '../Common/ListView';
-import PageTitle from '../Common/PageTitle';
+import Link from 'next/link';
 
 const messages = defineMessages({
   similar: 'Similar Series',
@@ -18,7 +19,10 @@ const messages = defineMessages({
 const TvSimilar: React.FC = () => {
   const router = useRouter();
   const intl = useIntl();
-  const { data: tvData } = useSWR<TvDetails>(`/api/v1/tv/${router.query.tvId}`);
+  const { locale } = useContext(LanguageContext);
+  const { data: tvData } = useSWR<TvDetails>(
+    `/api/v1/tv/${router.query.tvId}?language=${locale}`
+  );
   const {
     isLoadingInitialData,
     isEmpty,

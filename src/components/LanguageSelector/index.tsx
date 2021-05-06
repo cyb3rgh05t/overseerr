@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { sortBy } from 'lodash';
 import dynamic from 'next/dynamic';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import type { OptionsType, OptionTypeBase } from 'react-select';
-import useSWR from 'swr';
 import { Language } from '../../../server/lib/settings';
 import globalMessages from '../../i18n/globalMessages';
 
@@ -31,6 +29,7 @@ const selectStyles = {
 };
 
 interface LanguageSelectorProps {
+  languages: Language[];
   value?: string;
   setFieldValue: (property: string, value: string) => void;
   serverValue?: string;
@@ -38,33 +37,26 @@ interface LanguageSelectorProps {
 }
 
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({
+  languages,
   value,
   setFieldValue,
   serverValue,
   isUserSettings = false,
 }) => {
   const intl = useIntl();
-  const { data: languages } = useSWR<Language[]>('/api/v1/languages');
 
-  const sortedLanguages = useMemo(() => {
-    languages?.forEach((language) => {
-      language.name =
+  const defaultLanguageNameFallback = serverValue
+    ? languages.find((language) => language.iso_639_1 === serverValue)
+        ?.english_name ?? serverValue
+    : undefined;
+
+  const options: OptionType[] =
+    languages.map((language) => ({
+      label:
         intl.formatDisplayName(language.iso_639_1, {
           type: 'language',
           fallback: 'none',
-        }) ?? language.english_name;
-    });
-
-    return sortBy(languages, 'name');
-  }, [intl, languages]);
-
-  const languageName = (languageCode: string) =>
-    sortedLanguages?.find((language) => language.iso_639_1 === languageCode)
-      ?.name ?? languageCode;
-
-  const options: OptionType[] =
-    sortedLanguages?.map((language) => ({
-      label: language.name,
+        }) ?? language.english_name,
       value: language.iso_639_1,
     })) ?? [];
 
@@ -75,7 +67,13 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         language: serverValue
           ? serverValue
               .split('|')
-              .map((value) => languageName(value))
+              .map(
+                (value) =>
+                  intl.formatDisplayName(value, {
+                    type: 'language',
+                    fallback: 'none',
+                  }) ?? defaultLanguageNameFallback
+              )
               .reduce((prev, curr) =>
                 intl.formatMessage(globalMessages.delimitedlist, {
                   a: prev,
@@ -114,7 +112,13 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                 language: serverValue
                   ? serverValue
                       .split('|')
-                      .map((value) => languageName(value))
+                      .map(
+                        (value) =>
+                          intl.formatDisplayName(value, {
+                            type: 'language',
+                            fallback: 'none',
+                          }) ?? defaultLanguageNameFallback
+                      )
                       .reduce((prev, curr) =>
                         intl.formatMessage(globalMessages.delimitedlist, {
                           a: prev,
@@ -126,7 +130,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
               isFixed: true,
             }
           : value?.split('|').map((code) => {
-              const matchedLanguage = sortedLanguages?.find(
+              const matchedLanguage = languages.find(
                 (lang) => lang.iso_639_1 === code
               );
 
@@ -135,7 +139,11 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
               }
 
               return {
-                label: matchedLanguage.name,
+                label:
+                  intl.formatDisplayName(matchedLanguage.iso_639_1, {
+                    type: 'language',
+                    fallback: 'none',
+                  }) ?? matchedLanguage.english_name,
                 value: matchedLanguage.iso_639_1,
               };
             }) ?? undefined

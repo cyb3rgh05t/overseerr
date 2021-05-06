@@ -6,7 +6,6 @@ import {
   Permission,
   PermissionCheckOptions,
 } from '../../server/lib/permissions';
-import { NotificationAgentKey } from '../../server/lib/settings';
 
 export { Permission, UserType };
 export type { PermissionCheckOptions };
@@ -26,14 +25,10 @@ export interface User {
   settings?: UserSettings;
 }
 
-type NotificationAgentTypes = Record<NotificationAgentKey, number>;
-
 export interface UserSettings {
   discordId?: string;
   region?: string;
   originalLanguage?: string;
-  locale?: string;
-  notificationTypes: Partial<NotificationAgentTypes>;
 }
 
 interface UserHookResponse {

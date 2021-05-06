@@ -12,7 +12,7 @@ import {
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import useSWR from 'swr';
 import type { RTRating } from '../../../server/api/rottentomatoes';
@@ -23,7 +23,7 @@ import RTAudRotten from '../../assets/rt_aud_rotten.svg';
 import RTFresh from '../../assets/rt_fresh.svg';
 import RTRotten from '../../assets/rt_rotten.svg';
 import TmdbLogo from '../../assets/tmdb_logo.svg';
-import useLocale from '../../hooks/useLocale';
+import { LanguageContext } from '../../context/LanguageContext';
 import useSettings from '../../hooks/useSettings';
 import { Permission, useUser } from '../../hooks/useUser';
 import globalMessages from '../../i18n/globalMessages';
@@ -70,9 +70,9 @@ const messages = defineMessages({
   openradarr4k: 'Open Movie in 4K Radarr',
   downloadstatus: 'Download Status',
   playonplex: 'Play on Plex',
-  play4konplex: 'Play in 4K on Plex',
+  play4konplex: 'Play 4K on Plex',
   markavailable: 'Mark as Available',
-  mark4kavailable: 'Mark as Available in 4K',
+  mark4kavailable: 'Mark 4K as Available',
 });
 
 interface MovieDetailsProps {
@@ -84,11 +84,11 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
   const { user, hasPermission } = useUser();
   const router = useRouter();
   const intl = useIntl();
-  const { locale } = useLocale();
+  const { locale } = useContext(LanguageContext);
   const [showManager, setShowManager] = useState(false);
 
   const { data, error, revalidate } = useSWR<MovieDetailsType>(
-    `/api/v1/movie/${router.query.movieId}`,
+    `/api/v1/movie/${router.query.movieId}?language=${locale}`,
     {
       initialData: movie,
     }
@@ -112,16 +112,11 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
 
   const mediaLinks: PlayButtonLink[] = [];
 
-  if (
-    data.mediaInfo?.plexUrl &&
-    hasPermission([Permission.REQUEST, Permission.REQUEST_MOVIE], {
-      type: 'or',
-    })
-  ) {
+  if (data.mediaInfo?.plexUrl) {
     mediaLinks.push({
       text: intl.formatMessage(messages.playonplex),
       url: data.mediaInfo?.plexUrl,
-      svg: <PlayIcon />,
+      svg: <PlayIcon className="w-5 h-5 mr-1" />,
     });
   }
 
@@ -134,7 +129,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
     mediaLinks.push({
       text: intl.formatMessage(messages.play4konplex),
       url: data.mediaInfo?.plexUrl4k,
-      svg: <PlayIcon />,
+      svg: <PlayIcon className="w-5 h-5 mr-1" />,
     });
   }
 
@@ -147,7 +142,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
     mediaLinks.push({
       text: intl.formatMessage(messages.watchtrailer),
       url: trailerUrl,
-      svg: <FilmIcon />,
+      svg: <FilmIcon className="w-5 h-5 mr-1" />,
     });
   }
 
@@ -285,7 +280,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
                       className="w-full sm:mb-0"
                       buttonType="success"
                     >
-                      <CheckCircleIcon />
+                      <CheckCircleIcon className="w-5 h-5 mr-1" />
                       <span>{intl.formatMessage(messages.markavailable)}</span>
                     </Button>
                   </div>
@@ -299,7 +294,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
                       className="w-full sm:mb-0"
                       buttonType="success"
                     >
-                      <CheckCircleIcon />
+                      <CheckCircleIcon className="w-5 h-5 mr-1" />
                       <span>
                         {intl.formatMessage(messages.mark4kavailable)}
                       </span>
@@ -338,7 +333,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
                 className="block mb-2 last:mb-0"
               >
                 <Button buttonType="ghost" className="w-full">
-                  <ExternalLinkIcon />
+                  <ExternalLinkIcon className="w-5 h-5 mr-1" />
                   <span>{intl.formatMessage(messages.openradarr)}</span>
                 </Button>
               </a>
@@ -350,7 +345,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
                 rel="noreferrer"
               >
                 <Button buttonType="ghost" className="w-full">
-                  <ExternalLinkIcon />
+                  <ExternalLinkIcon className="w-5 h-5 mr-1" />
                   <span>{intl.formatMessage(messages.openradarr4k)}</span>
                 </Button>
               </a>
@@ -364,10 +359,10 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
               confirmText={intl.formatMessage(globalMessages.areyousure)}
               className="w-full"
             >
-              <DocumentRemoveIcon />
-              <span>{intl.formatMessage(messages.manageModalClearMedia)}</span>
+              <DocumentRemoveIcon className="w-5 h-5 mr-1" />
+              {intl.formatMessage(messages.manageModalClearMedia)}
             </ConfirmButton>
-            <div className="mt-3 text-xs text-gray-400">
+            <div className="mt-2 text-sm text-gray-400">
               {intl.formatMessage(messages.manageModalClearMediaWarning)}
             </div>
           </div>
@@ -445,7 +440,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
               className="ml-2 first:ml-0"
               onClick={() => setShowManager(true)}
             >
-              <CogIcon />
+              <CogIcon className="w-5" />
             </Button>
           )}
         </div>
@@ -475,7 +470,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
                 <Link href={`/movie/${data.id}/crew`}>
                   <a className="flex items-center text-gray-400 transition duration-300 hover:text-gray-100">
                     <span>{intl.formatMessage(messages.viewfullcrew)}</span>
-                    <ArrowCircleRightIcon className="inline-block w-5 h-5 ml-1.5" />
+                    <ArrowCircleRightIcon className="inline-block w-5 h-5 ml-1" />
                   </a>
                 </Link>
               </div>
@@ -658,7 +653,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
             <Link href="/movie/[movieId]/cast" as={`/movie/${data.id}/cast`}>
               <a className="slider-title">
                 <span>{intl.formatMessage(messages.cast)}</span>
-                <ArrowCircleRightIcon />
+                <ArrowCircleRightIcon className="w-6 h-6 ml-2" />
               </a>
             </Link>
           </div>

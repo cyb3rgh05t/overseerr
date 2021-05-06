@@ -1,12 +1,13 @@
 import { groupBy } from 'lodash';
 import { useRouter } from 'next/router';
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import TruncateMarkup from 'react-truncate-markup';
 import useSWR from 'swr';
 import type { PersonCombinedCreditsResponse } from '../../../server/interfaces/api/personInterfaces';
 import type { PersonDetail } from '../../../server/models/Person';
 import Ellipsis from '../../assets/ellipsis.svg';
+import { LanguageContext } from '../../context/LanguageContext';
 import globalMessages from '../../i18n/globalMessages';
 import Error from '../../pages/_error';
 import CachedImage from '../Common/CachedImage';
@@ -26,9 +27,10 @@ const messages = defineMessages({
 
 const PersonDetails: React.FC = () => {
   const intl = useIntl();
+  const { locale } = useContext(LanguageContext);
   const router = useRouter();
   const { data, error } = useSWR<PersonDetail>(
-    `/api/v1/person/${router.query.personId}`
+    `/api/v1/person/${router.query.personId}?language=${locale}`
   );
   const [showBio, setShowBio] = useState(false);
 
@@ -36,7 +38,7 @@ const PersonDetails: React.FC = () => {
     data: combinedCredits,
     error: errorCombinedCredits,
   } = useSWR<PersonCombinedCreditsResponse>(
-    `/api/v1/person/${router.query.personId}/combined_credits`
+    `/api/v1/person/${router.query.personId}/combined_credits?language=${locale}`
   );
 
   const sortedCast = useMemo(() => {

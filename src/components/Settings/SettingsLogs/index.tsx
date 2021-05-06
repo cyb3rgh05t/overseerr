@@ -142,7 +142,7 @@ const SettingsLogs: React.FC = () => {
       >
         <Modal
           title={intl.formatMessage(messages.logDetails)}
-          iconSvg={<DocumentSearchIcon />}
+          iconSvg={<DocumentSearchIcon className="w-6 h-6" />}
           onCancel={() => setActiveLog(null)}
           cancelText={intl.formatMessage(globalMessages.close)}
           onOk={() => (activeLog ? copyLogString(activeLog) : undefined)}
@@ -243,7 +243,13 @@ const SettingsLogs: React.FC = () => {
               buttonType={refreshInterval ? 'default' : 'primary'}
               onClick={() => toggleLogs()}
             >
-              {refreshInterval ? <PauseIcon /> : <PlayIcon />}
+              <span>
+                {refreshInterval ? (
+                  <PauseIcon className="w-5 h-5 mr-1" />
+                ) : (
+                  <PlayIcon className="w-5 h-5 mr-1" />
+                )}
+              </span>
               <span>
                 {intl.formatMessage(
                   refreshInterval ? messages.pauseLogs : messages.resumeLogs
@@ -329,7 +335,7 @@ const SettingsLogs: React.FC = () => {
                         onClick={() => setActiveLog(row)}
                         className="mr-2"
                       >
-                        <DocumentSearchIcon className="icon-md" />
+                        <DocumentSearchIcon className="w-5 h-5 text-white" />
                       </Button>
                     )}
                     <Button
@@ -337,7 +343,7 @@ const SettingsLogs: React.FC = () => {
                       buttonSize="sm"
                       onClick={() => copyLogString(row)}
                     >
-                      <ClipboardCopyIcon className="icon-md" />
+                      <ClipboardCopyIcon className="w-5 h-5 text-white" />
                     </Button>
                   </Table.TD>
                 </tr>

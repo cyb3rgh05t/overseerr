@@ -1,22 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import useSWR from 'swr';
+import GenreCard from '../../GenreCard';
 import { GenreSliderItem } from '../../../../server/interfaces/api/discoverInterfaces';
-import Error from '../../../pages/_error';
+import { LanguageContext } from '../../../context/LanguageContext';
+import { genreColorMap } from '../constants';
+import PageTitle from '../../Common/PageTitle';
 import Header from '../../Common/Header';
 import LoadingSpinner from '../../Common/LoadingSpinner';
-import PageTitle from '../../Common/PageTitle';
-import GenreCard from '../../GenreCard';
-import { genreColorMap } from '../constants';
+import Error from '../../../pages/_error';
 
 const messages = defineMessages({
   moviegenres: 'Movie Genres',
 });
 
 const MovieGenreList: React.FC = () => {
+  const { locale } = useContext(LanguageContext);
   const intl = useIntl();
   const { data, error } = useSWR<GenreSliderItem[]>(
-    `/api/v1/discover/genreslider/movie`
+    `/api/v1/discover/genreslider/movie?language=${locale}`
   );
 
   if (!data && !error) {

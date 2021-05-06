@@ -39,7 +39,7 @@ const StatusChecker: React.FC = () => {
       show={data.commitTag !== process.env.commitTag}
     >
       <Modal
-        iconSvg={<SparklesIcon />}
+        iconSvg={<SparklesIcon className="w-6 h-6" />}
         title={intl.formatMessage(messages.newversionavailable)}
         onOk={() => location.reload()}
         okText={intl.formatMessage(messages.reloadOverseerr)}

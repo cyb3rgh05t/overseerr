@@ -49,14 +49,12 @@ const PlexLoginButton: React.FC<PlexLoginButtonProps> = ({
         disabled={loading || isProcessing}
         className="plex-button"
       >
-        <LoginIcon />
-        <span>
-          {loading
-            ? intl.formatMessage(globalMessages.loading)
-            : isProcessing
-            ? intl.formatMessage(messages.signingin)
-            : intl.formatMessage(messages.signinwithplex)}
-        </span>
+        <LoginIcon className="w-5 h-5 mr-1" />
+        {loading
+          ? intl.formatMessage(globalMessages.loading)
+          : isProcessing
+          ? intl.formatMessage(messages.signingin)
+          : intl.formatMessage(messages.signinwithplex)}
       </button>
     </span>
   );

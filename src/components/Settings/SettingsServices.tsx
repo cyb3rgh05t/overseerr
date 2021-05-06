@@ -7,8 +7,6 @@ import type {
   RadarrSettings,
   SonarrSettings,
 } from '../../../server/lib/settings';
-import RadarrLogo from '../../assets/services/radarr.svg';
-import SonarrLogo from '../../assets/services/sonarr.svg';
 import globalMessages from '../../i18n/globalMessages';
 import Alert from '../Common/Alert';
 import Badge from '../Common/Badge';
@@ -30,7 +28,6 @@ const messages = defineMessages({
   ssl: 'SSL',
   default: 'Default',
   default4k: 'Default 4K',
-  is4k: '4K',
   address: 'Address',
   activeProfile: 'Active Profile',
   addradarr: 'Add Radarr Server',
@@ -39,8 +36,6 @@ const messages = defineMessages({
     'At least one {serverType} server must be marked as default in order for {mediaType} requests to be processed.',
   noDefaultNon4kServer:
     'If you only have a single {serverType} server for both non-4K and 4K content (or if you only download 4K content), your {serverType} server should <strong>NOT</strong> be designated as a 4K server.',
-  noDefault4kServer:
-    'A 4K {serverType} server must be marked as default in order to enable users to submit 4K {mediaType} requests.',
   mediaTypeMovie: 'movie',
   mediaTypeSeries: 'series',
 });
@@ -48,7 +43,7 @@ const messages = defineMessages({
 interface ServerInstanceProps {
   name: string;
   isDefault?: boolean;
-  is4k?: boolean;
+  isDefault4K?: boolean;
   hostname: string;
   port: number;
   isSSL?: boolean;
@@ -64,7 +59,7 @@ const ServerInstance: React.FC<ServerInstanceProps> = ({
   hostname,
   port,
   profileName,
-  is4k = false,
+  isDefault4K = false,
   isDefault = false,
   isSSL = false,
   isSonarr = false,
@@ -82,7 +77,7 @@ const ServerInstance: React.FC<ServerInstanceProps> = ({
     <li className="col-span-1 bg-gray-700 rounded-lg shadow">
       <div className="flex items-center justify-between w-full p-6 space-x-6">
         <div className="flex-1 truncate">
-          <div className="flex items-center mb-2 space-x-2">
+          <div className="flex items-center mb-2 space-x-3">
             <h3 className="font-medium leading-5 text-white truncate">
               <a
                 href={serviceUrl}
@@ -91,15 +86,10 @@ const ServerInstance: React.FC<ServerInstanceProps> = ({
                 {name}
               </a>
             </h3>
-            {isDefault && !is4k && (
-              <Badge>{intl.formatMessage(messages.default)}</Badge>
-            )}
-            {isDefault && is4k && (
-              <Badge>{intl.formatMessage(messages.default4k)}</Badge>
-            )}
-            {!isDefault && is4k && (
+            {isDefault && <Badge>{intl.formatMessage(messages.default)}</Badge>}
+            {isDefault4K && (
               <Badge badgeType="warning">
-                {intl.formatMessage(messages.is4k)}
+                {intl.formatMessage(messages.default4k)}
               </Badge>
             )}
             {isSSL && (
@@ -127,11 +117,11 @@ const ServerInstance: React.FC<ServerInstanceProps> = ({
           </p>
         </div>
         <a href={serviceUrl} className="opacity-50 hover:opacity-100">
-          {isSonarr ? (
-            <SonarrLogo className="flex-shrink-0 w-10 h-10" />
-          ) : (
-            <RadarrLogo className="flex-shrink-0 w-10 h-10" />
-          )}
+          <img
+            className="flex-shrink-0 w-10 h-10"
+            src={`/images/${isSonarr ? 'sonarr' : 'radarr'}_logo.svg`}
+            alt={isSonarr ? 'Sonarr' : 'Radarr'}
+          />
         </a>
       </div>
       <div className="border-t border-gray-800">
@@ -142,7 +132,7 @@ const ServerInstance: React.FC<ServerInstanceProps> = ({
               className="relative inline-flex items-center justify-center flex-1 w-0 py-4 -mr-px text-sm font-medium leading-5 text-gray-200 transition duration-150 ease-in-out border border-transparent rounded-bl-lg hover:text-white focus:outline-none focus:ring-blue focus:border-gray-500 focus:z-10"
             >
               <PencilIcon className="w-5 h-5 mr-2" />
-              <span>{intl.formatMessage(globalMessages.edit)}</span>
+              {intl.formatMessage(globalMessages.edit)}
             </button>
           </div>
           <div className="flex flex-1 w-0 -ml-px">
@@ -151,7 +141,7 @@ const ServerInstance: React.FC<ServerInstanceProps> = ({
               className="relative inline-flex items-center justify-center flex-1 w-0 py-4 text-sm font-medium leading-5 text-gray-200 transition duration-150 ease-in-out border border-transparent rounded-br-lg hover:text-white focus:outline-none focus:ring-blue focus:border-gray-500 focus:z-10"
             >
               <TrashIcon className="w-5 h-5 mr-2" />
-              <span>{intl.formatMessage(globalMessages.delete)}</span>
+              {intl.formatMessage(globalMessages.delete)}
             </button>
           </div>
         </div>
@@ -267,7 +257,7 @@ const SettingsServices: React.FC = () => {
             })
           }
           title="Delete Server"
-          iconSvg={<TrashIcon />}
+          iconSvg={<TrashIcon className="w-6 h-6" />}
         >
           {intl.formatMessage(messages.deleteserverconfirm)}
         </Modal>
@@ -284,30 +274,20 @@ const SettingsServices: React.FC = () => {
                     mediaType: intl.formatMessage(messages.mediaTypeMovie),
                   })}
                 />
-              ) : !radarrData.some(
-                  (radarr) => radarr.isDefault && !radarr.is4k
-                ) ? (
-                <Alert
-                  title={intl.formatMessage(messages.noDefaultNon4kServer, {
-                    serverType: 'Radarr',
-                    strong: function strong(msg) {
-                      return (
-                        <strong className="font-semibold text-yellow-100">
-                          {msg}
-                        </strong>
-                      );
-                    },
-                  })}
-                />
               ) : (
-                radarrData.some((radarr) => radarr.is4k) &&
                 !radarrData.some(
-                  (radarr) => radarr.isDefault && radarr.is4k
+                  (radarr) => radarr.isDefault && !radarr.is4k
                 ) && (
                   <Alert
-                    title={intl.formatMessage(messages.noDefault4kServer, {
+                    title={intl.formatMessage(messages.noDefaultNon4kServer, {
                       serverType: 'Radarr',
-                      mediaType: intl.formatMessage(messages.mediaTypeMovie),
+                      strong: function strong(msg) {
+                        return (
+                          <strong className="font-semibold text-yellow-100">
+                            {msg}
+                          </strong>
+                        );
+                      },
                     })}
                   />
                 )
@@ -321,8 +301,8 @@ const SettingsServices: React.FC = () => {
                   port={radarr.port}
                   profileName={radarr.activeProfileName}
                   isSSL={radarr.useSsl}
-                  isDefault={radarr.isDefault}
-                  is4k={radarr.is4k}
+                  isDefault={radarr.isDefault && !radarr.is4k}
+                  isDefault4K={radarr.is4k && radarr.isDefault}
                   externalUrl={radarr.externalUrl}
                   onEdit={() => setEditRadarrModal({ open: true, radarr })}
                   onDelete={() =>
@@ -343,8 +323,8 @@ const SettingsServices: React.FC = () => {
                       setEditRadarrModal({ open: true, radarr: null })
                     }
                   >
-                    <PlusIcon />
-                    <span>{intl.formatMessage(messages.addradarr)}</span>
+                    <PlusIcon className="w-5 h-5 mr-1" />
+                    {intl.formatMessage(messages.addradarr)}
                   </Button>
                 </div>
               </li>
@@ -374,30 +354,20 @@ const SettingsServices: React.FC = () => {
                     mediaType: intl.formatMessage(messages.mediaTypeSeries),
                   })}
                 />
-              ) : !sonarrData.some(
-                  (sonarr) => sonarr.isDefault && !sonarr.is4k
-                ) ? (
-                <Alert
-                  title={intl.formatMessage(messages.noDefaultNon4kServer, {
-                    serverType: 'Sonarr',
-                    strong: function strong(msg) {
-                      return (
-                        <strong className="font-semibold text-yellow-100">
-                          {msg}
-                        </strong>
-                      );
-                    },
-                  })}
-                />
               ) : (
-                sonarrData.some((sonarr) => sonarr.is4k) &&
                 !sonarrData.some(
-                  (sonarr) => sonarr.isDefault && sonarr.is4k
+                  (sonarr) => sonarr.isDefault && !sonarr.is4k
                 ) && (
                   <Alert
-                    title={intl.formatMessage(messages.noDefault4kServer, {
+                    title={intl.formatMessage(messages.noDefaultNon4kServer, {
                       serverType: 'Sonarr',
-                      mediaType: intl.formatMessage(messages.mediaTypeSeries),
+                      strong: function strong(msg) {
+                        return (
+                          <strong className="font-semibold text-yellow-100">
+                            {msg}
+                          </strong>
+                        );
+                      },
                     })}
                   />
                 )
@@ -412,8 +382,8 @@ const SettingsServices: React.FC = () => {
                   profileName={sonarr.activeProfileName}
                   isSSL={sonarr.useSsl}
                   isSonarr
-                  isDefault={sonarr.isDefault}
-                  is4k={sonarr.is4k}
+                  isDefault4K={sonarr.isDefault && sonarr.is4k}
+                  isDefault={sonarr.isDefault && !sonarr.is4k}
                   externalUrl={sonarr.externalUrl}
                   onEdit={() => setEditSonarrModal({ open: true, sonarr })}
                   onDelete={() =>
@@ -433,8 +403,8 @@ const SettingsServices: React.FC = () => {
                       setEditSonarrModal({ open: true, sonarr: null })
                     }
                   >
-                    <PlusIcon />
-                    <span>{intl.formatMessage(messages.addsonarr)}</span>
+                    <PlusIcon className="w-5 h-5 mr-1" />
+                    {intl.formatMessage(messages.addsonarr)}
                   </Button>
                 </div>
               </li>

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useInView } from 'react-intersection-observer';
 import useSWR from 'swr';
-import TitleCard from '.';
 import type { MovieDetails } from '../../../server/models/Movie';
 import type { TvDetails } from '../../../server/models/Tv';
+import TitleCard from '.';
+import { LanguageContext } from '../../context/LanguageContext';
 
 interface TmdbTitleCardProps {
   tmdbId: number;
@@ -18,10 +19,11 @@ const TmdbTitleCard: React.FC<TmdbTitleCardProps> = ({ tmdbId, type }) => {
   const { ref, inView } = useInView({
     triggerOnce: true,
   });
+  const { locale } = useContext(LanguageContext);
   const url =
     type === 'movie' ? `/api/v1/movie/${tmdbId}` : `/api/v1/tv/${tmdbId}`;
   const { data: title, error } = useSWR<MovieDetails | TvDetails>(
-    inView ? `${url}` : null
+    inView ? `${url}?language=${locale}` : null
   );
 
   if (!title && !error) {

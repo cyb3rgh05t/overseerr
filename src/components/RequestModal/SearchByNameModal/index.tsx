@@ -52,7 +52,7 @@ const SearchByNameModal: React.FC<SearchByNameModalProps> = ({
       okText={intl.formatMessage(globalMessages.next)}
       okDisabled={!tvdbId}
       okButtonType="primary"
-      iconSvg={<DownloadIcon />}
+      iconSvg={<DownloadIcon className="w-6 h-6" />}
     >
       <Alert
         title={intl.formatMessage(messages.notvdbiddescription)}

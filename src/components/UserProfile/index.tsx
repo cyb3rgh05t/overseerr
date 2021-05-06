@@ -237,7 +237,7 @@ const UserProfile: React.FC = () => {
             <Link href={`/users/${user?.id}/requests?filter=all`}>
               <a className="slider-title">
                 <span>{intl.formatMessage(messages.recentrequests)}</span>
-                <ArrowCircleRightIcon />
+                <ArrowCircleRightIcon className="w-6 h-6 ml-2" />
               </a>
             </Link>
           </div>

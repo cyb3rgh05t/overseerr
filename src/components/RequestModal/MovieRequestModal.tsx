@@ -236,7 +236,7 @@ const MovieRequestModal: React.FC<RequestModalProps> = ({
         }
         secondaryButtonType="danger"
         cancelText={intl.formatMessage(globalMessages.close)}
-        iconSvg={<DownloadIcon />}
+        iconSvg={<DownloadIcon className="w-6 h-6" />}
       >
         {isOwner
           ? intl.formatMessage(messages.pendingapproval)
@@ -294,7 +294,7 @@ const MovieRequestModal: React.FC<RequestModalProps> = ({
             )
       }
       okButtonType={'primary'}
-      iconSvg={<DownloadIcon />}
+      iconSvg={<DownloadIcon className="w-6 h-6" />}
     >
       {hasAutoApprove && !quota?.movie.restricted && (
         <div className="mt-6">

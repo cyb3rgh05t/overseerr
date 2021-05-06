@@ -14,15 +14,15 @@ jobs:
     runs-on: ubuntu-20.04
     container: node:14.16-alpine
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v2
-      - name: Install dependencies
+      - name: install dependencies
         env:
           HUSKY_SKIP_INSTALL: 1
         run: yarn
-      - name: Lint
+      - name: lint
         run: yarn lint
-      - name: Build
+      - name: build
         run: yarn build
 
   build_and_push:
@@ -70,7 +70,7 @@ jobs:
             ghcr.io/sct/overseerr:develop
             ghcr.io/sct/overseerr:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
       - # Temporary fix
         # https://github.com/docker/build-push-action/issues/252
         # https://github.com/moby/buildkit/issues/1896

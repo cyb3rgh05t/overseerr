@@ -27,7 +27,6 @@ import Header from '../Common/Header';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import Modal from '../Common/Modal';
 import PageTitle from '../Common/PageTitle';
-import SensitiveInput from '../Common/SensitiveInput';
 import Table from '../Common/Table';
 import Transition from '../Transition';
 import BulkEditModal from './BulkEditModal';
@@ -274,7 +273,7 @@ const UserList: React.FC = () => {
           okButtonType="danger"
           onCancel={() => setDeleteModal({ isOpen: false })}
           title={intl.formatMessage(messages.deleteuser)}
-          iconSvg={<TrashIcon />}
+          iconSvg={<TrashIcon className="w-6 h-6" />}
         >
           {intl.formatMessage(messages.deleteconfirm)}
         </Modal>
@@ -336,7 +335,7 @@ const UserList: React.FC = () => {
             return (
               <Modal
                 title={intl.formatMessage(messages.createuser)}
-                iconSvg={<UserAddIcon />}
+                iconSvg={<UserAddIcon className="w-6 h-6" />}
                 onOk={() => handleSubmit()}
                 okText={
                   isSubmitting
@@ -364,7 +363,7 @@ const UserList: React.FC = () => {
                           id="email"
                           name="email"
                           type="text"
-                          inputMode="email"
+                          placeholder="name@example.com"
                         />
                       </div>
                       {errors.email && touched.email && (
@@ -403,8 +402,7 @@ const UserList: React.FC = () => {
                     </label>
                     <div className="form-input">
                       <div className="form-input-field">
-                        <SensitiveInput
-                          as="field"
+                        <Field
                           id="password"
                           name="password"
                           type="password"
@@ -453,8 +451,8 @@ const UserList: React.FC = () => {
               buttonType="primary"
               onClick={() => setCreateModal({ isOpen: true })}
             >
-              <UserAddIcon />
-              <span>{intl.formatMessage(messages.createlocaluser)}</span>
+              <UserAddIcon className="w-5 h-5 mr-1" />
+              {intl.formatMessage(messages.createlocaluser)}
             </Button>
             <Button
               className="flex-grow outline lg:mr-2"
@@ -462,8 +460,8 @@ const UserList: React.FC = () => {
               disabled={isImporting}
               onClick={() => importFromPlex()}
             >
-              <InboxInIcon />
-              <span>{intl.formatMessage(messages.importfromplex)}</span>
+              <InboxInIcon className="w-5 h-5 mr-1" />
+              {intl.formatMessage(messages.importfromplex)}
             </Button>
           </div>
           <div className="flex flex-grow mb-2 lg:mb-0 lg:flex-grow-0">
@@ -525,8 +523,8 @@ const UserList: React.FC = () => {
                   onClick={() => setShowBulkEditModal(true)}
                   disabled={selectedUsers.length === 0}
                 >
-                  <PencilIcon />
-                  <span>{intl.formatMessage(messages.bulkedit)}</span>
+                  <PencilIcon className="w-5 h-5 mr-1" />
+                  {intl.formatMessage(messages.bulkedit)}
                 </Button>
               )}
             </Table.TH>

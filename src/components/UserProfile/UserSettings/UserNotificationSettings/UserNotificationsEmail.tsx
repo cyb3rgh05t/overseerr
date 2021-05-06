@@ -1,18 +1,21 @@
 import axios from 'axios';
 import { Field, Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { useToasts } from 'react-toast-notifications';
 import useSWR from 'swr';
 import * as Yup from 'yup';
 import { UserSettingsNotificationsResponse } from '../../../../../server/interfaces/api/userSettingsInterfaces';
+import {
+  hasNotificationAgentEnabled,
+  NotificationAgentType,
+} from '../../../../../server/lib/notifications/agenttypes';
 import { useUser } from '../../../../hooks/useUser';
 import globalMessages from '../../../../i18n/globalMessages';
 import Badge from '../../../Common/Badge';
 import Button from '../../../Common/Button';
 import LoadingSpinner from '../../../Common/LoadingSpinner';
-import { ALL_NOTIFICATIONS } from '../../../NotificationTypeSelector';
 import { OpenPgpLink } from '../../../Settings/Notifications/NotificationsEmail';
 
 const messages = defineMessages({
@@ -29,10 +32,17 @@ const UserEmailSettings: React.FC = () => {
   const intl = useIntl();
   const { addToast } = useToasts();
   const router = useRouter();
+  const [notificationAgents, setNotificationAgents] = useState(0);
   const { user } = useUser({ id: Number(router.query.userId) });
   const { data, error, revalidate } = useSWR<UserSettingsNotificationsResponse>(
     user ? `/api/v1/user/${user?.id}/settings/notifications` : null
   );
+
+  useEffect(() => {
+    setNotificationAgents(
+      data?.notificationAgents ?? NotificationAgentType.EMAIL
+    );
+  }, [data]);
 
   const UserNotificationsEmailSchema = Yup.object().shape({
     pgpKey: Yup.string()
@@ -50,7 +60,10 @@ const UserEmailSettings: React.FC = () => {
   return (
     <Formik
       initialValues={{
-        enableEmail: !!(data?.notificationTypes.email ?? true),
+        enableEmail: hasNotificationAgentEnabled(
+          NotificationAgentType.EMAIL,
+          data?.notificationAgents ?? NotificationAgentType.EMAIL
+        ),
         pgpKey: data?.pgpKey,
       }}
       validationSchema={UserNotificationsEmailSchema}
@@ -58,13 +71,11 @@ const UserEmailSettings: React.FC = () => {
       onSubmit={async (values) => {
         try {
           await axios.post(`/api/v1/user/${user?.id}/settings/notifications`, {
+            notificationAgents,
             pgpKey: values.pgpKey,
             discordId: data?.discordId,
             telegramChatId: data?.telegramChatId,
             telegramSendSilently: data?.telegramSendSilently,
-            notificationTypes: {
-              email: values.enableEmail ? ALL_NOTIFICATIONS : 0,
-            },
           });
           addToast(intl.formatMessage(messages.emailsettingssaved), {
             appearance: 'success',
@@ -80,7 +91,7 @@ const UserEmailSettings: React.FC = () => {
         }
       }}
     >
-      {({ errors, touched, isSubmitting, isValid }) => {
+      {({ errors, touched, isSubmitting, isValid, values, setFieldValue }) => {
         return (
           <Form className="section">
             <div className="form-row">
@@ -88,7 +99,26 @@ const UserEmailSettings: React.FC = () => {
                 {intl.formatMessage(messages.enableEmail)}
               </label>
               <div className="form-input">
-                <Field type="checkbox" id="enableEmail" name="enableEmail" />
+                <Field
+                  type="checkbox"
+                  id="enableEmail"
+                  name="enableEmail"
+                  checked={hasNotificationAgentEnabled(
+                    NotificationAgentType.EMAIL,
+                    notificationAgents
+                  )}
+                  onChange={() => {
+                    setNotificationAgents(
+                      hasNotificationAgentEnabled(
+                        NotificationAgentType.EMAIL,
+                        notificationAgents
+                      )
+                        ? notificationAgents - NotificationAgentType.EMAIL
+                        : notificationAgents + NotificationAgentType.EMAIL
+                    );
+                    setFieldValue('enableEmail', !values.enableEmail);
+                  }}
+                />
               </div>
             </div>
             <div className="form-row">

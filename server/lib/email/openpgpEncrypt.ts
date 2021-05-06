@@ -1,6 +1,6 @@
-import crypto from 'crypto';
 import * as openpgp from 'openpgp';
 import { Transform, TransformCallback } from 'stream';
+import crypto from 'crypto';
 
 interface EncryptorOptions {
   signingKey?: string;
@@ -54,8 +54,7 @@ class PGPEncryptor extends Transform {
       privateKey = await openpgp.readKey({
         armoredKey: this._signingKey,
       });
-
-      await openpgp.decryptKey({ privateKey, passphrase: this._password });
+      await privateKey.decrypt(this._password);
     }
 
     const emailPartDelimiter = '\r\n\r\n';
@@ -129,12 +128,11 @@ class PGPEncryptor extends Transform {
       .join('\r\n');
 
     const encryptedMessage = await openpgp.encrypt({
-      message: await openpgp.createMessage({
-        text:
-          contentHeadersRaw +
+      message: openpgp.Message.fromText(
+        contentHeadersRaw +
           emailPartDelimiter +
-          messageParts.join(emailPartDelimiter),
-      }),
+          messageParts.join(emailPartDelimiter)
+      ),
       publicKeys: validPublicKeys,
       privateKeys: privateKey,
     });

@@ -1,11 +1,7 @@
 import React from 'react';
-import { defineMessages, FormattedRelativeTime, useIntl } from 'react-intl';
+import { FormattedRelativeTime } from 'react-intl';
 import { DownloadingItem } from '../../../server/lib/downloadtracker';
 import Badge from '../Common/Badge';
-
-const messages = defineMessages({
-  estimatedtime: 'Estimated {time}',
-});
 
 interface DownloadBlockProps {
   downloadItem: DownloadingItem;
@@ -16,8 +12,6 @@ const DownloadBlock: React.FC<DownloadBlockProps> = ({
   downloadItem,
   is4k = false,
 }) => {
-  const intl = useIntl();
-
   return (
     <div className="p-4">
       <div className="w-56 mb-2 text-sm truncate sm:w-80 md:w-full">
@@ -54,30 +48,27 @@ const DownloadBlock: React.FC<DownloadBlockProps> = ({
       <div className="flex items-center justify-between text-xs">
         <span>
           {is4k && (
-            <Badge badgeType="warning" className="mr-2">
+            <Badge badgeType="warning" className="mr-1">
               4K
             </Badge>
           )}
           <Badge className="capitalize">{downloadItem.status}</Badge>
         </span>
         <span>
-          {downloadItem.estimatedCompletionTime
-            ? intl.formatMessage(messages.estimatedtime, {
-                time: (
-                  <FormattedRelativeTime
-                    value={Math.floor(
-                      (new Date(
-                        downloadItem.estimatedCompletionTime
-                      ).getTime() -
-                        Date.now()) /
-                        1000
-                    )}
-                    updateIntervalInSeconds={1}
-                    numeric="auto"
-                  />
-                ),
-              })
-            : ''}
+          ETA{' '}
+          {downloadItem.estimatedCompletionTime ? (
+            <FormattedRelativeTime
+              value={Math.floor(
+                (new Date(downloadItem.estimatedCompletionTime).getTime() -
+                  Date.now()) /
+                  1000
+              )}
+              updateIntervalInSeconds={1}
+              numeric="auto"
+            />
+          ) : (
+            'N/A'
+          )}
         </span>
       </div>
     </div>

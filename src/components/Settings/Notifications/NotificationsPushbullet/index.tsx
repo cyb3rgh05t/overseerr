@@ -1,34 +1,31 @@
 import axios from 'axios';
 import { Field, Form, Formik } from 'formik';
-import React, { useState } from 'react';
+import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { useToasts } from 'react-toast-notifications';
 import useSWR from 'swr';
 import * as Yup from 'yup';
 import globalMessages from '../../../../i18n/globalMessages';
+import Alert from '../../../Common/Alert';
 import Button from '../../../Common/Button';
 import LoadingSpinner from '../../../Common/LoadingSpinner';
-import SensitiveInput from '../../../Common/SensitiveInput';
 import NotificationTypeSelector from '../../../NotificationTypeSelector';
 
 const messages = defineMessages({
   agentEnabled: 'Enable Agent',
   accessToken: 'Access Token',
-  accessTokenTip:
-    'Create a token from your <PushbulletSettingsLink>Account Settings</PushbulletSettingsLink>',
   validationAccessTokenRequired: 'You must provide an access token',
   pushbulletSettingsSaved:
     'Pushbullet notification settings saved successfully!',
   pushbulletSettingsFailed: 'Pushbullet notification settings failed to save.',
-  toastPushbulletTestSending: 'Sending Pushbullet test notification…',
-  toastPushbulletTestSuccess: 'Pushbullet test notification sent!',
-  toastPushbulletTestFailed: 'Pushbullet test notification failed to send.',
+  testSent: 'Pushbullet test notification sent!',
+  settingUpPushbulletDescription:
+    'To configure Pushbullet notifications, you will need to <CreateAccessTokenLink>create an access token</CreateAccessTokenLink>.',
 });
 
 const NotificationsPushbullet: React.FC = () => {
   const intl = useIntl();
-  const { addToast, removeToast } = useToasts();
-  const [isTesting, setIsTesting] = useState(false);
+  const { addToast } = useToasts();
   const { data, error, revalidate } = useSWR(
     '/api/v1/settings/notifications/pushbullet'
   );
@@ -80,129 +77,104 @@ const NotificationsPushbullet: React.FC = () => {
     >
       {({ errors, touched, isSubmitting, values, isValid, setFieldValue }) => {
         const testSettings = async () => {
-          setIsTesting(true);
-          let toastId: string | undefined;
-          try {
-            addToast(
-              intl.formatMessage(messages.toastPushbulletTestSending),
-              {
-                autoDismiss: false,
-                appearance: 'info',
-              },
-              (id) => {
-                toastId = id;
-              }
-            );
-            await axios.post('/api/v1/settings/notifications/pushbullet/test', {
-              enabled: true,
-              types: values.types,
-              options: {
-                accessToken: values.accessToken,
-              },
-            });
+          await axios.post('/api/v1/settings/notifications/pushbullet/test', {
+            enabled: true,
+            types: values.types,
+            options: {
+              accessToken: values.accessToken,
+            },
+          });
 
-            if (toastId) {
-              removeToast(toastId);
-            }
-            addToast(intl.formatMessage(messages.toastPushbulletTestSuccess), {
-              autoDismiss: true,
-              appearance: 'success',
-            });
-          } catch (e) {
-            if (toastId) {
-              removeToast(toastId);
-            }
-            addToast(intl.formatMessage(messages.toastPushbulletTestFailed), {
-              autoDismiss: true,
-              appearance: 'error',
-            });
-          } finally {
-            setIsTesting(false);
-          }
+          addToast(intl.formatMessage(messages.testSent), {
+            appearance: 'info',
+            autoDismiss: true,
+          });
         };
 
         return (
-          <Form className="section">
-            <div className="form-row">
-              <label htmlFor="enabled" className="checkbox-label">
-                {intl.formatMessage(messages.agentEnabled)}
-                <span className="label-required">*</span>
-              </label>
-              <div className="form-input">
-                <Field type="checkbox" id="enabled" name="enabled" />
-              </div>
-            </div>
-            <div className="form-row">
-              <label htmlFor="accessToken" className="text-label">
-                {intl.formatMessage(messages.accessToken)}
-                <span className="label-required">*</span>
-                <span className="label-tip">
-                  {intl.formatMessage(messages.accessTokenTip, {
-                    PushbulletSettingsLink: function PushbulletSettingsLink(
-                      msg
-                    ) {
-                      return (
-                        <a
-                          href="https://www.pushbullet.com/#settings/account"
-                          className="text-white transition duration-300 hover:underline"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {msg}
-                        </a>
-                      );
-                    },
-                  })}
-                </span>
-              </label>
-              <div className="form-input">
-                <div className="form-input-field">
-                  <SensitiveInput
-                    as="field"
-                    id="accessToken"
-                    name="accessToken"
-                    autoComplete="one-time-code"
-                  />
-                </div>
-                {errors.accessToken && touched.accessToken && (
-                  <div className="error">{errors.accessToken}</div>
-                )}
-              </div>
-            </div>
-            <NotificationTypeSelector
-              currentTypes={values.types}
-              onUpdate={(newTypes) => setFieldValue('types', newTypes)}
+          <>
+            <Alert
+              title={intl.formatMessage(
+                messages.settingUpPushbulletDescription,
+                {
+                  CreateAccessTokenLink: function CreateAccessTokenLink(msg) {
+                    return (
+                      <a
+                        href="https://www.pushbullet.com/#settings"
+                        className="text-white transition duration-300 hover:underline"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {msg}
+                      </a>
+                    );
+                  },
+                }
+              )}
+              type="info"
             />
-            <div className="actions">
-              <div className="flex justify-end">
-                <span className="inline-flex ml-3 rounded-md shadow-sm">
-                  <Button
-                    buttonType="warning"
-                    disabled={isSubmitting || !isValid || isTesting}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      testSettings();
-                    }}
-                  >
-                    {isTesting
-                      ? intl.formatMessage(globalMessages.testing)
-                      : intl.formatMessage(globalMessages.test)}
-                  </Button>
-                </span>
-                <span className="inline-flex ml-3 rounded-md shadow-sm">
-                  <Button
-                    buttonType="primary"
-                    type="submit"
-                    disabled={isSubmitting || !isValid || isTesting}
-                  >
-                    {isSubmitting
-                      ? intl.formatMessage(globalMessages.saving)
-                      : intl.formatMessage(globalMessages.save)}
-                  </Button>
-                </span>
+            <Form className="section">
+              <div className="form-row">
+                <label htmlFor="enabled" className="checkbox-label">
+                  {intl.formatMessage(messages.agentEnabled)}
+                </label>
+                <div className="form-input">
+                  <Field type="checkbox" id="enabled" name="enabled" />
+                </div>
               </div>
-            </div>
-          </Form>
+              <div className="form-row">
+                <label htmlFor="accessToken" className="text-label">
+                  {intl.formatMessage(messages.accessToken)}
+                  <span className="label-required">*</span>
+                </label>
+                <div className="form-input">
+                  <div className="form-input-field">
+                    <Field
+                      id="accessToken"
+                      name="accessToken"
+                      type="text"
+                      placeholder={intl.formatMessage(messages.accessToken)}
+                    />
+                  </div>
+                  {errors.accessToken && touched.accessToken && (
+                    <div className="error">{errors.accessToken}</div>
+                  )}
+                </div>
+              </div>
+              <NotificationTypeSelector
+                currentTypes={values.types}
+                onUpdate={(newTypes) => setFieldValue('types', newTypes)}
+              />
+              <div className="actions">
+                <div className="flex justify-end">
+                  <span className="inline-flex ml-3 rounded-md shadow-sm">
+                    <Button
+                      buttonType="warning"
+                      disabled={isSubmitting || !isValid}
+                      onClick={(e) => {
+                        e.preventDefault();
+
+                        testSettings();
+                      }}
+                    >
+                      {intl.formatMessage(globalMessages.test)}
+                    </Button>
+                  </span>
+                  <span className="inline-flex ml-3 rounded-md shadow-sm">
+                    <Button
+                      buttonType="primary"
+                      type="submit"
+                      disabled={isSubmitting || !isValid}
+                    >
+                      {isSubmitting
+                        ? intl.formatMessage(globalMessages.saving)
+                        : intl.formatMessage(globalMessages.save)}
+                    </Button>
+                  </span>
+                </div>
+              </div>
+            </Form>
+          </>
         );
       }}
     </Formik>

@@ -29,7 +29,6 @@ import { getSettings } from '../lib/settings';
 import logger from '../logger';
 import { MediaRequest } from './MediaRequest';
 import SeasonRequest from './SeasonRequest';
-import { UserPushSubscription } from './UserPushSubscription';
 import { UserSettings } from './UserSettings';
 
 @Entity()
@@ -105,9 +104,6 @@ export class User {
     onDelete: 'CASCADE',
   })
   public settings?: UserSettings;
-
-  @OneToMany(() => UserPushSubscription, (pushSub) => pushSub.user)
-  public pushSubscriptions: UserPushSubscription[];
 
   @CreateDateColumn()
   public createdAt: Date;

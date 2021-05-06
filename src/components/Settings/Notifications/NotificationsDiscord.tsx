@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Field, Form, Formik } from 'formik';
-import React, { useState } from 'react';
+import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { useToasts } from 'react-toast-notifications';
 import useSWR from 'swr';
@@ -15,20 +15,16 @@ const messages = defineMessages({
   botUsername: 'Bot Username',
   botAvatarUrl: 'Bot Avatar URL',
   webhookUrl: 'Webhook URL',
-  webhookUrlTip:
-    'Create a <DiscordWebhookLink>webhook integration</DiscordWebhookLink> in your server',
+  webhookUrlPlaceholder: 'Server Settings → Integrations → Webhooks',
   discordsettingssaved: 'Discord notification settings saved successfully!',
   discordsettingsfailed: 'Discord notification settings failed to save.',
-  toastDiscordTestSending: 'Sending Discord test notification…',
-  toastDiscordTestSuccess: 'Discord test notification sent!',
-  toastDiscordTestFailed: 'Discord test notification failed to send.',
+  discordtestsent: 'Discord test notification sent!',
   validationUrl: 'You must provide a valid URL',
 });
 
 const NotificationsDiscord: React.FC = () => {
   const intl = useIntl();
-  const { addToast, removeToast } = useToasts();
-  const [isTesting, setIsTesting] = useState(false);
+  const { addToast } = useToasts();
   const { data, error, revalidate } = useSWR(
     '/api/v1/settings/notifications/discord'
   );
@@ -90,47 +86,20 @@ const NotificationsDiscord: React.FC = () => {
     >
       {({ errors, touched, isSubmitting, values, isValid, setFieldValue }) => {
         const testSettings = async () => {
-          setIsTesting(true);
-          let toastId: string | undefined;
-          try {
-            addToast(
-              intl.formatMessage(messages.toastDiscordTestSending),
-              {
-                autoDismiss: false,
-                appearance: 'info',
-              },
-              (id) => {
-                toastId = id;
-              }
-            );
-            await axios.post('/api/v1/settings/notifications/discord/test', {
-              enabled: true,
-              types: values.types,
-              options: {
-                botUsername: values.botUsername,
-                botAvatarUrl: values.botAvatarUrl,
-                webhookUrl: values.webhookUrl,
-              },
-            });
+          await axios.post('/api/v1/settings/notifications/discord/test', {
+            enabled: true,
+            types: values.types,
+            options: {
+              botUsername: values.botUsername,
+              botAvatarUrl: values.botAvatarUrl,
+              webhookUrl: values.webhookUrl,
+            },
+          });
 
-            if (toastId) {
-              removeToast(toastId);
-            }
-            addToast(intl.formatMessage(messages.toastDiscordTestSuccess), {
-              autoDismiss: true,
-              appearance: 'success',
-            });
-          } catch (e) {
-            if (toastId) {
-              removeToast(toastId);
-            }
-            addToast(intl.formatMessage(messages.toastDiscordTestFailed), {
-              autoDismiss: true,
-              appearance: 'error',
-            });
-          } finally {
-            setIsTesting(false);
-          }
+          addToast(intl.formatMessage(messages.discordtestsent), {
+            appearance: 'info',
+            autoDismiss: true,
+          });
         };
 
         return (
@@ -138,45 +107,9 @@ const NotificationsDiscord: React.FC = () => {
             <div className="form-row">
               <label htmlFor="enabled" className="checkbox-label">
                 {intl.formatMessage(messages.agentenabled)}
-                <span className="label-required">*</span>
               </label>
               <div className="form-input">
                 <Field type="checkbox" id="enabled" name="enabled" />
-              </div>
-            </div>
-            <div className="form-row">
-              <label htmlFor="name" className="text-label">
-                {intl.formatMessage(messages.webhookUrl)}
-                <span className="label-required">*</span>
-                <span className="label-tip">
-                  {intl.formatMessage(messages.webhookUrlTip, {
-                    DiscordWebhookLink: function DiscordWebhookLink(msg) {
-                      return (
-                        <a
-                          href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
-                          className="text-white transition duration-300 hover:underline"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {msg}
-                        </a>
-                      );
-                    },
-                  })}
-                </span>
-              </label>
-              <div className="form-input">
-                <div className="form-input-field">
-                  <Field
-                    id="webhookUrl"
-                    name="webhookUrl"
-                    type="text"
-                    inputMode="url"
-                  />
-                </div>
-                {errors.webhookUrl && touched.webhookUrl && (
-                  <div className="error">{errors.webhookUrl}</div>
-                )}
               </div>
             </div>
             <div className="form-row">
@@ -185,7 +118,12 @@ const NotificationsDiscord: React.FC = () => {
               </label>
               <div className="form-input">
                 <div className="form-input-field">
-                  <Field id="botUsername" name="botUsername" type="text" />
+                  <Field
+                    id="botUsername"
+                    name="botUsername"
+                    type="text"
+                    placeholder={intl.formatMessage(messages.botUsername)}
+                  />
                 </div>
                 {errors.botUsername && touched.botUsername && (
                   <div className="error">{errors.botUsername}</div>
@@ -202,11 +140,32 @@ const NotificationsDiscord: React.FC = () => {
                     id="botAvatarUrl"
                     name="botAvatarUrl"
                     type="text"
-                    inputMode="url"
+                    placeholder={intl.formatMessage(messages.botAvatarUrl)}
                   />
                 </div>
                 {errors.botAvatarUrl && touched.botAvatarUrl && (
                   <div className="error">{errors.botAvatarUrl}</div>
+                )}
+              </div>
+            </div>
+            <div className="form-row">
+              <label htmlFor="name" className="text-label">
+                {intl.formatMessage(messages.webhookUrl)}
+                <span className="label-required">*</span>
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <Field
+                    id="webhookUrl"
+                    name="webhookUrl"
+                    type="text"
+                    placeholder={intl.formatMessage(
+                      messages.webhookUrlPlaceholder
+                    )}
+                  />
+                </div>
+                {errors.webhookUrl && touched.webhookUrl && (
+                  <div className="error">{errors.webhookUrl}</div>
                 )}
               </div>
             </div>
@@ -219,22 +178,21 @@ const NotificationsDiscord: React.FC = () => {
                 <span className="inline-flex ml-3 rounded-md shadow-sm">
                   <Button
                     buttonType="warning"
-                    disabled={isSubmitting || !isValid || isTesting}
+                    disabled={isSubmitting || !isValid}
                     onClick={(e) => {
                       e.preventDefault();
+
                       testSettings();
                     }}
                   >
-                    {isTesting
-                      ? intl.formatMessage(globalMessages.testing)
-                      : intl.formatMessage(globalMessages.test)}
+                    {intl.formatMessage(globalMessages.test)}
                   </Button>
                 </span>
                 <span className="inline-flex ml-3 rounded-md shadow-sm">
                   <Button
                     buttonType="primary"
                     type="submit"
-                    disabled={isSubmitting || !isValid || isTesting}
+                    disabled={isSubmitting || !isValid}
                   >
                     {isSubmitting
                       ? intl.formatMessage(globalMessages.saving)

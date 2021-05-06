@@ -3,13 +3,14 @@ import axios from 'axios';
 import { uniq } from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { useToasts } from 'react-toast-notifications';
 import useSWR from 'swr';
 import { MediaStatus } from '../../../server/constants/media';
 import type { MediaRequest } from '../../../server/entity/MediaRequest';
 import type { Collection } from '../../../server/models/Collection';
+import { LanguageContext } from '../../context/LanguageContext';
 import useSettings from '../../hooks/useSettings';
 import { Permission, useUser } from '../../hooks/useUser';
 import globalMessages from '../../i18n/globalMessages';
@@ -47,13 +48,14 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({
   const router = useRouter();
   const settings = useSettings();
   const { addToast } = useToasts();
+  const { locale } = useContext(LanguageContext);
   const { hasPermission } = useUser();
   const [requestModal, setRequestModal] = useState(false);
   const [isRequesting, setRequesting] = useState(false);
   const [is4k, setIs4k] = useState(false);
 
   const { data, error, revalidate } = useSWR<Collection>(
-    `/api/v1/collection/${router.query.collectionId}`,
+    `/api/v1/collection/${router.query.collectionId}?language=${locale}`,
     {
       initialData: collection,
       revalidateOnMount: true,
@@ -61,7 +63,7 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({
   );
 
   const { data: genres } = useSWR<{ id: number; name: string }[]>(
-    `/api/v1/genres/movie`
+    `/api/v1/genres/movie?language=${locale}`
   );
 
   if (!data && !error) {
@@ -108,18 +110,11 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({
   }
 
   const hasRequestable =
-    hasPermission([Permission.REQUEST, Permission.REQUEST_MOVIE], {
-      type: 'or',
-    }) &&
     data.parts.filter(
       (part) => !part.mediaInfo || part.mediaInfo.status === MediaStatus.UNKNOWN
     ).length > 0;
 
   const hasRequestable4k =
-    settings.currentSettings.movie4kEnabled &&
-    hasPermission([Permission.REQUEST_4K, Permission.REQUEST_4K_MOVIE], {
-      type: 'or',
-    }) &&
     data.parts.filter(
       (part) =>
         !part.mediaInfo || part.mediaInfo.status4k === MediaStatus.UNKNOWN
@@ -254,7 +249,7 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({
           title={intl.formatMessage(
             is4k ? messages.requestcollection4k : messages.requestcollection
           )}
-          iconSvg={<DuplicateIcon />}
+          iconSvg={<DuplicateIcon className="w-6 h-6" />}
         >
           <p>
             {intl.formatMessage(
@@ -330,42 +325,55 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({
           </span>
         </div>
         <div className="media-actions">
-          {(hasRequestable || hasRequestable4k) && (
-            <ButtonWithDropdown
-              buttonType="primary"
-              onClick={() => {
-                setRequestModal(true);
-                setIs4k(!hasRequestable);
-              }}
-              text={
-                <>
-                  <DownloadIcon />
-                  <span>
-                    {intl.formatMessage(
-                      hasRequestable
-                        ? messages.requestcollection
-                        : messages.requestcollection4k
-                    )}
-                  </span>
-                </>
-              }
-            >
-              {hasRequestable && hasRequestable4k && (
-                <ButtonWithDropdown.Item
-                  buttonType="primary"
-                  onClick={() => {
-                    setRequestModal(true);
-                    setIs4k(true);
-                  }}
-                >
-                  <DownloadIcon />
-                  <span>
-                    {intl.formatMessage(messages.requestcollection4k)}
-                  </span>
-                </ButtonWithDropdown.Item>
-              )}
-            </ButtonWithDropdown>
-          )}
+          {hasPermission(Permission.REQUEST) &&
+            (hasRequestable ||
+              (settings.currentSettings.movie4kEnabled &&
+                hasPermission(
+                  [Permission.REQUEST_4K, Permission.REQUEST_4K_MOVIE],
+                  { type: 'or' }
+                ) &&
+                hasRequestable4k)) && (
+              <ButtonWithDropdown
+                buttonType="primary"
+                onClick={() => {
+                  setRequestModal(true);
+                  setIs4k(!hasRequestable);
+                }}
+                text={
+                  <>
+                    <DownloadIcon className="w-5 h-5 mr-1" />
+                    <span>
+                      {intl.formatMessage(
+                        hasRequestable
+                          ? messages.requestcollection
+                          : messages.requestcollection4k
+                      )}
+                    </span>
+                  </>
+                }
+              >
+                {settings.currentSettings.movie4kEnabled &&
+                  hasPermission(
+                    [Permission.REQUEST_4K, Permission.REQUEST_4K_MOVIE],
+                    { type: 'or' }
+                  ) &&
+                  hasRequestable &&
+                  hasRequestable4k && (
+                    <ButtonWithDropdown.Item
+                      buttonType="primary"
+                      onClick={() => {
+                        setRequestModal(true);
+                        setIs4k(true);
+                      }}
+                    >
+                      <DownloadIcon className="w-5 h-5 mr-1" />
+                      <span>
+                        {intl.formatMessage(messages.requestcollection4k)}
+                      </span>
+                    </ButtonWithDropdown.Item>
+                  )}
+              </ButtonWithDropdown>
+            )}
         </div>
       </div>
       {data.overview && (

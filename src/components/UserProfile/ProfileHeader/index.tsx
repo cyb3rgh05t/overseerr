@@ -93,8 +93,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             passHref
           >
             <Button as="a">
-              <CogIcon />
-              <span>{intl.formatMessage(messages.settings)}</span>
+              <CogIcon className="w-5 h-5 mr-1" />
+              {intl.formatMessage(messages.settings)}
             </Button>
           </Link>
         ) : (
@@ -106,8 +106,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               passHref
             >
               <Button as="a">
-                <UserIcon />
-                <span>{intl.formatMessage(messages.profile)}</span>
+                <UserIcon className="w-5 h-5 mr-1" />
+                {intl.formatMessage(messages.profile)}
               </Button>
             </Link>
           )

@@ -10,7 +10,6 @@ import * as Yup from 'yup';
 import type { SonarrSettings } from '../../../../server/lib/settings';
 import globalMessages from '../../../i18n/globalMessages';
 import Modal from '../../Common/Modal';
-import SensitiveInput from '../../Common/SensitiveInput';
 import Transition from '../../Transition';
 
 type OptionType = {
@@ -38,11 +37,14 @@ const messages = defineMessages({
   defaultserver: 'Default Server',
   default4kserver: 'Default 4K Server',
   servername: 'Server Name',
+  servernamePlaceholder: 'A Sonarr Server',
   hostname: 'Hostname or IP Address',
   port: 'Port',
   ssl: 'Enable SSL',
   apiKey: 'API Key',
-  baseUrl: 'URL Base',
+  apiKeyPlaceholder: 'Your Sonarr API key',
+  baseUrl: 'Base URL',
+  baseUrlPlaceholder: 'Example: /sonarr',
   qualityprofile: 'Quality Profile',
   languageprofile: 'Language Profile',
   rootfolder: 'Root Folder',
@@ -64,6 +66,7 @@ const messages = defineMessages({
   testFirstTags: 'Test connection to load tags',
   syncEnabled: 'Enable Scan',
   externalUrl: 'External URL',
+  externalUrlPlaceholder: 'External URL pointing to your Sonarr server',
   enableSearch: 'Enable Automatic Search',
   validationApplicationUrl: 'You must provide a valid URL',
   validationApplicationUrlTrailingSlash: 'URL must not end in a trailing slash',
@@ -254,7 +257,7 @@ const SonarrModal: React.FC<SonarrModalProps> = ({
         initialValues={{
           name: sonarr?.name,
           hostname: sonarr?.hostname,
-          port: sonarr?.port ?? 8989,
+          port: sonarr?.port,
           ssl: sonarr?.useSsl ?? false,
           apiKey: sonarr?.apiKey,
           baseUrl: sonarr?.baseUrl,
@@ -385,7 +388,13 @@ const SonarrModal: React.FC<SonarrModalProps> = ({
                       values.is4k ? messages.edit4ksonarr : messages.editsonarr
                     )
               }
-              iconSvg={!sonarr ? <PlusIcon /> : <PencilIcon />}
+              iconSvg={
+                !sonarr ? (
+                  <PlusIcon className="w-6 h-6" />
+                ) : (
+                  <PencilIcon className="w-6 h-6" />
+                )
+              }
             >
               <div className="mb-6">
                 <div className="form-row">
@@ -419,6 +428,9 @@ const SonarrModal: React.FC<SonarrModalProps> = ({
                         id="name"
                         name="name"
                         type="text"
+                        placeholder={intl.formatMessage(
+                          messages.servernamePlaceholder
+                        )}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           setIsValidated(false);
                           setFieldValue('name', e.target.value);
@@ -444,7 +456,7 @@ const SonarrModal: React.FC<SonarrModalProps> = ({
                         id="hostname"
                         name="hostname"
                         type="text"
-                        inputMode="url"
+                        placeholder="127.0.0.1"
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           setIsValidated(false);
                           setFieldValue('hostname', e.target.value);
@@ -467,7 +479,7 @@ const SonarrModal: React.FC<SonarrModalProps> = ({
                       id="port"
                       name="port"
                       type="text"
-                      inputMode="numeric"
+                      placeholder="8989"
                       className="short"
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setIsValidated(false);
@@ -502,11 +514,13 @@ const SonarrModal: React.FC<SonarrModalProps> = ({
                   </label>
                   <div className="form-input">
                     <div className="form-input-field">
-                      <SensitiveInput
-                        as="field"
+                      <Field
                         id="apiKey"
                         name="apiKey"
-                        autoComplete="one-time-code"
+                        type="text"
+                        placeholder={intl.formatMessage(
+                          messages.apiKeyPlaceholder
+                        )}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           setIsValidated(false);
                           setFieldValue('apiKey', e.target.value);
@@ -528,7 +542,9 @@ const SonarrModal: React.FC<SonarrModalProps> = ({
                         id="baseUrl"
                         name="baseUrl"
                         type="text"
-                        inputMode="url"
+                        placeholder={intl.formatMessage(
+                          messages.baseUrlPlaceholder
+                        )}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           setIsValidated(false);
                           setFieldValue('baseUrl', e.target.value);
@@ -922,7 +938,9 @@ const SonarrModal: React.FC<SonarrModalProps> = ({
                         id="externalUrl"
                         name="externalUrl"
                         type="text"
-                        inputMode="url"
+                        placeholder={intl.formatMessage(
+                          messages.externalUrlPlaceholder
+                        )}
                       />
                     </div>
                     {errors.externalUrl && touched.externalUrl && (
