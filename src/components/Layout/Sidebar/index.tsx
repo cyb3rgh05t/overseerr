@@ -93,7 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
               leaveTo="opacity-0"
             >
               <div className="fixed inset-0">
-                <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
+                <div className="absolute inset-0 bg-blue-500 opacity-75"></div>
               </div>
             </Transition>
             <Transition
@@ -108,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
                 <div className="relative flex flex-col flex-1 w-full max-w-xs bg-warmGray-800 sidebar">
                   <div className="absolute top-0 right-0 p-1 sidebar-close-button -mr-14">
                     <button
-                      className="flex items-center justify-center w-12 h-12 rounded-full focus:outline-none focus:bg-gray-600"
+                      className="flex items-center justify-center w-12 h-12 rounded-full focus:outline-none focus:bg-blue-500"
                       aria-label="Close sidebar"
                       onClick={() => setClosed()}
                     >
@@ -152,7 +152,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
                                   router.pathname.match(
                                     sidebarLink.activeRegExp
                                   )
-                                    ? 'bg-gray-900'
+                                    ? 'bg-blue-900'
                                     : ''
                                 }
                               `}
@@ -204,12 +204,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
                       as={sidebarLink.as}
                     >
                       <a
-                        className={`flex group items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-white hover:text-gray-100 hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150
+                        className={`flex group items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-white hover:text-gray-100 hover:bg-blue-700 focus:outline-none focus:bg-blue-700 transition ease-in-out duration-150
                                 ${
                                   router.pathname.match(
                                     sidebarLink.activeRegExp
                                   )
-                                    ? 'bg-gray-900'
+                                    ? 'bg-blue-900'
                                     : ''
                                 }
                               `}
