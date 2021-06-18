@@ -60,7 +60,7 @@ const Login: React.FC = () => {
   }, [user, router]);
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-gray-900 py-14">
+    <div className="relative flex flex-col min-h-screen bg-warmGray-800 py-14">
       <PageTitle title={intl.formatMessage(messages.signin)} />
       <ImageFader
         backgroundImages={[
@@ -147,7 +147,7 @@ const Login: React.FC = () => {
                   {settings.currentSettings.localLogin && (
                     <div>
                       <button
-                        className={`w-full py-2 text-sm text-center text-gray-400 transition-colors duration-200 bg-gray-800 cursor-default focus:outline-none bg-opacity-70 hover:bg-gray-700 hover:cursor-pointer ${
+                        className={`w-full py-2 text-sm text-center text-gray-400 transition-colors duration-200 bg-warmGray-700 cursor-default focus:outline-none bg-opacity-70 hover:bg-gray-700 hover:cursor-pointer ${
                           openIndexes.includes(1)
                             ? 'text-indigo-500'
                             : 'sm:rounded-b-lg'
