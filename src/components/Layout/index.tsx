@@ -52,9 +52,9 @@ const Layout: React.FC = ({ children }) => {
   }, []);
 
   return (
-    <div className="flex h-full min-w-0 min-h-full bg-black">
-      <div className="absolute w-full h-64 bg-black">
-        <div className="relative inset-0 w-full h-full bg-black" />
+    <div className="flex h-full min-w-0 min-h-full bg-warmGray-800">
+      <div className="absolute w-full h-64 bg-warmGray-800">
+        <div className="relative inset-0 w-full h-full bg-warmGray-800" />
       </div>
       <Sidebar open={isSidebarOpen} setClosed={() => setSidebarOpen(false)} />
 
