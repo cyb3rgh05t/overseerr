@@ -93,7 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
               leaveTo="opacity-0"
             >
               <div className="fixed inset-0">
-                <div className="absolute inset-0 bg-blue-500 opacity-75"></div>
+                <div className="absolute inset-0 bg-blue-400 opacity-75"></div>
               </div>
             </Transition>
             <Transition
@@ -152,7 +152,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
                                   router.pathname.match(
                                     sidebarLink.activeRegExp
                                   )
-                                    ? 'bg-blue-900'
+                                    ? 'bg-blue-400'
                                     : ''
                                 }
                               `}
@@ -204,12 +204,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
                       as={sidebarLink.as}
                     >
                       <a
-                        className={`flex group items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-white hover:text-gray-100 hover:bg-blue-700 focus:outline-none focus:bg-blue-700 transition ease-in-out duration-150
+                        className={`flex group items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-white hover:text-gray-100 hover:bg-blue-500 focus:outline-none focus:bg-blue-500 transition ease-in-out duration-150
                                 ${
                                   router.pathname.match(
                                     sidebarLink.activeRegExp
                                   )
-                                    ? 'bg-blue-900'
+                                    ? 'bg-blue-400'
                                     : ''
                                 }
                               `}
