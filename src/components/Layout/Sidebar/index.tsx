@@ -105,7 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
               leaveTo="-translate-x-full"
             >
               <>
-                <div className="relative flex flex-col flex-1 w-full max-w-xs bg-black sidebar">
+                <div className="relative flex flex-col flex-1 w-full max-w-xs bg-warmGray-800 sidebar">
                   <div className="absolute top-0 right-0 p-1 sidebar-close-button -mr-14">
                     <button
                       className="flex items-center justify-center w-12 h-12 rounded-full focus:outline-none focus:bg-gray-600"
@@ -182,7 +182,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
 
       <div className="fixed top-0 bottom-0 left-0 hidden md:flex md:flex-shrink-0">
         <div className="flex flex-col w-64 sidebar">
-          <div className="flex flex-col flex-1 h-0 bg-black">
+          <div className="flex flex-col flex-1 h-0 bg-warmGray-800">
             <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
               <div className="flex items-center flex-shrink-0 px-4">
                 <span className="text-2xl text-gray-50">
@@ -191,7 +191,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setClosed }) => {
                   </a>
                 </span>
               </div>
-              <nav className="flex-1 px-2 mt-5 space-y-1 bg-black">
+              <nav className="flex-1 px-2 mt-5 space-y-1 bg-warmGray-800">
                 {SidebarLinks.filter((link) =>
                   link.requiredPermission
                     ? hasPermission(link.requiredPermission)
